@@ -1,0 +1,109 @@
+﻿@model IEnumerable<QLVatTuPhongThiNghiem.Models.ViewModels.XuatNhapTonViewModel>
+@{
+    ViewData["Title"] = "Quản lý xuất nhập tồn";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>Quản lý xuất nhập tồn</h3>
+                </div>
+                <div class="col-6">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Dashboard")"><i data-feather="home"></i></a></li>
+                        <li class="breadcrumb-item">Xuất nhập tồn</li>
+                        <li class="breadcrumb-item active">Danh sách</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Danh sách phiếu xuất nhập</h5>
+                        <div class="card-header-right">
+                            <a href="@Url.Action("Nhap", "XuatNhapTon")" class="btn btn-success">
+                                <i data-feather="plus-circle"></i> Nhập thiết bị
+                            </a>
+                            <a href="@Url.Action("Xuat", "XuatNhapTon")" class="btn btn-warning">
+                                <i data-feather="minus-circle"></i> Xuất thiết bị
+                            </a>
+                            <a href="@Url.Action("BaoCaoTonKho", "XuatNhapTon")" class="btn btn-info">
+                                <i data-feather="bar-chart-2"></i> Báo cáo tồn kho
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Mã phiếu</th>
+                                        <th>Loại phiếu</th>
+                                        <th>Thiết bị</th>
+                                        <th>Số lượng</th>
+                                        <th>Ngày tạo</th>
+                                        <th>Người tạo</th>
+                                        <th>Ghi chú</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model?.Any() == true)
+                                    {
+                                        @foreach (var item in Model)
+                                        {
+                                            <tr>
+                                                <td>@item.MaPhieu</td>
+                                                <td>
+                                                    @if (item.LoaiPhieu == "NHAP")
+                                                    {
+                                                        <span class="badge badge-success">
+                                                            <i data-feather="arrow-down"></i> Nhập
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge badge-warning">
+                                                            <i data-feather="arrow-up"></i> Xuất
+                                                        </span>
+                                                    }
+                                                </td>
+                                                <td>@item.TenThietBi</td>
+                                                <td>
+                                                    <span class="@(item.LoaiPhieu == "NHAP" ? "text-success" : "text-warning")">
+                                                        @(item.LoaiPhieu == "NHAP" ? "+" : "-")@item.SoLuong
+                                                    </span>
+                                                </td>
+                                                <td>@item.NgayTao.ToString("dd/MM/yyyy HH:mm")</td>
+                                                <td>@item.TenNguoiTao</td>
+                                                <td>@item.GhiChu</td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="7" class="text-center">Chưa có phiếu xuất nhập nào</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        feather.replace();
+    });

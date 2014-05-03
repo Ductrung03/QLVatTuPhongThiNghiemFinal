@@ -1,0 +1,701 @@
+﻿@model IEnumerable<QLVatTuPhongThiNghiem.Models.ViewModels.SuaChuaViewModel>
+@{
+    ViewData["Title"] = "Quản lý sửa chữa bảo hành";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>Quản lý sửa chữa bảo hành</h3>
+                </div>
+                <div class="col-6">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index", "Dashboard")">
+                                <i data-feather="home"></i>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">Sửa chữa</li>
+                        <li class="breadcrumb-item active">Danh sách</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <!-- Alert Messages -->
+        <div class="row">
+            <div class="col-sm-12">
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i data-feather="check-circle"></i>
+                        @TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i data-feather="alert-circle"></i>
+                        @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Filter Card -->
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header bg-primary">
+                        <h5 class="text-white mb-0">
+                            <i data-feather="filter" class="me-2"></i>Bộ lọc và tìm kiếm
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="get" asp-action="Index" class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label">Trạng thái</label>
+                                <select class="form-select" name="trangThai">
+                                    <option value="">-- Tất cả trạng thái --</option>
+                                    <option value="Chờ sửa chữa">Chờ sửa chữa</option>
+                                    <option value="Đang sửa chữa">Đang sửa chữa</option>
+                                    <option value="Hoàn thành">Hoàn thành</option>
+                                    <option value="Tạm dừng">Tạm dừng</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Loại sửa chữa</label>
+                                <select class="form-select" name="loaiSuaChua">
+                                    <option value="">-- Tất cả loại --</option>
+                                    <option value="Bảo hành">Bảo hành</option>
+                                    <option value="Sửa chữa thông thường">Sửa chữa thông thường</option>
+                                    <option value="Bảo trì định kỳ">Bảo trì định kỳ</option>
+                                    <option value="Nâng cấp">Nâng cấp</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Từ ngày</label>
+                                <input type="date" class="form-control" name="tuNgay" value="@ViewBag.TuNgay">
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <div class="d-grid w-100">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i data-feather="search"></i> Tìm kiếm
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="row mb-3">
+            <div class="col-sm-12">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <a href="@Url.Action("Create", "SuaChua")" class="btn btn-success">
+                            <i data-feather="plus"></i> Tạo phiếu sửa chữa
+                        </a>
+                        <a href="@Url.Action("InProgress", "SuaChua")" class="btn btn-warning">
+                            <i data-feather="clock"></i> Đang sửa chữa
+                        </a>
+                        <a href="@Url.Action("Statistics", "SuaChua")" class="btn btn-info">
+                            <i data-feather="bar-chart-2"></i> Thống kê
+                        </a>
+                        <a href="@Url.Action("Maintenance", "SuaChua")" class="btn btn-secondary">
+                            <i data-feather="calendar"></i> Lịch bảo trì
+                        </a>
+                    </div>
+                    <div>
+                        <button onclick="exportToExcel()" class="btn btn-outline-success">
+                            <i data-feather="download"></i> Xuất Excel
+                        </button>
+                        <button onclick="printPage()" class="btn btn-outline-primary">
+                            <i data-feather="printer"></i> In báo cáo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        @if (Model?.Any() == true)
+        {
+            <div class="row mb-4">
+                <div class="col-xl-3 col-md-6">
+                    <div class="card border-primary">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h4 class="text-primary mb-0">@Model.Count()</h4>
+                                    <p class="text-muted mb-0">Tổng phiếu SC</p>
+                                </div>
+                                <i data-feather="file-text" class="text-primary" style="width: 48px; height: 48px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="card border-warning">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h4 class="text-warning mb-0">@Model.Count(x => x.TrangThai == "Đang sửa chữa")</h4>
+                                    <p class="text-muted mb-0">Đang thực hiện</p>
+                                </div>
+                                <i data-feather="tool" class="text-warning" style="width: 48px; height: 48px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="card border-success">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h4 class="text-success mb-0">@Model.Count(x => x.TrangThai == "Hoàn thành")</h4>
+                                    <p class="text-muted mb-0">Hoàn thành</p>
+                                </div>
+                                <i data-feather="check-circle" class="text-success" style="width: 48px; height: 48px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="card border-info">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h4 class="text-info mb-0">@String.Format("{0:N0}K", Model.Where(x => x.ChiPhi.HasValue).Sum(x => x.ChiPhi.Value) / 1000)</h4>
+                                    <p class="text-muted mb-0">Tổng chi phí (VNĐ)</p>
+                                </div>
+                                <i data-feather="dollar-sign" class="text-info" style="width: 48px; height: 48px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Main Table -->
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header bg-dark">
+                        <h5 class="text-white mb-0">
+                            <i data-feather="list" class="me-2"></i>Danh sách phiếu sửa chữa
+                            <span class="badge bg-light text-dark ms-2">@Model.Count() phiếu</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        @if (Model?.Any() == true)
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="suaChuaTable">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>STT</th>
+                                            <th>Mã SC</th>
+                                            <th>Thiết bị</th>
+                                            <th>Loại sửa chữa</th>
+                                            <th>Ngày bắt đầu</th>
+                                            <th>Ngày kết thúc</th>
+                                            <th>Thời gian SC</th>
+                                            <th>Chi phí</th>
+                                            <th>Trạng thái</th>
+                                            <th>Người thực hiện</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int index = 1;
+                                        }
+                                        @foreach (var item in Model.OrderByDescending(x => x.NgayBatDau))
+                                        {
+                                            <tr>
+                                                <td>@index</td>
+                                                <td>
+                                                    <code>@item.MaSuaChua</code>
+                                                </td>
+                                                <td>
+                                                    <div>
+                                                        <strong>@item.TenThietBi</strong>
+                                                       
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    @{
+                                                        string typeClass = item.LoaiSuaChua == "Bảo hành" ? "bg-info" :
+                                                        item.LoaiSuaChua == "Bảo trì định kỳ" ? "bg-warning" :
+                                                        "bg-secondary";
+                                                    }
+                                                    <span class="badge @typeClass">@item.LoaiSuaChua</span>
+                                                </td>
+                                                <td>
+                                                    <div>
+                                                        <strong>@item.NgayBatDau.ToString("dd/MM/yyyy")</strong>
+                                                        <br>
+                                                        <small class="text-muted">@item.NgayBatDau.ToString("HH:mm")</small>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    @if (item.NgayKetThuc.HasValue)
+                                                    {
+                                                        <div>
+                                                            <strong>@item.NgayKetThuc.Value.ToString("dd/MM/yyyy")</strong>
+                                                            <br>
+                                                            <small class="text-muted">@item.NgayKetThuc.Value.ToString("HH:mm")</small>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">Chưa hoàn thành</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @if (item.NgayKetThuc.HasValue)
+                                                    {
+                                                        var duration = item.NgayKetThuc.Value - item.NgayBatDau;
+                                                        var days = (int)duration.TotalDays;
+                                                        var hours = duration.Hours;
+
+                                                        <span class="badge bg-secondary">
+                                                            @if (days > 0)
+                                                            {
+                                                                @($"{days} ngày {hours}h")
+                                                            }
+                                                            else
+                                                            {
+                                                                @($"{hours}h {duration.Minutes}m")
+                                                            }
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        var elapsed = DateTime.Now - item.NgayBatDau;
+                                                        var days = (int)elapsed.TotalDays;
+
+                                                        <span class="badge bg-warning">
+                                                            @($"Đã {days} ngày")
+                                                        </span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @if (item.ChiPhi.HasValue)
+                                                    {
+                                                        <strong>@String.Format("{0:N0}", item.ChiPhi.Value)</strong>
+                                                        <small class="text-muted d-block">VNĐ</small>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">Chưa có</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @{
+                                                        string statusClass = "";
+                                                        string statusIcon = "";
+
+                                                        switch (item.TrangThai)
+                                                        {
+                                                            case "Chờ sửa chữa":
+                                                                statusClass = "bg-primary";
+                                                                statusIcon = "clock";
+                                                                break;
+                                                            case "Đang sửa chữa":
+                                                                statusClass = "bg-warning";
+                                                                statusIcon = "tool";
+                                                                break;
+                                                            case "Hoàn thành":
+                                                                statusClass = "bg-success";
+                                                                statusIcon = "check-circle";
+                                                                break;
+                                                            case "Tạm dừng":
+                                                                statusClass = "bg-danger";
+                                                                statusIcon = "pause-circle";
+                                                                break;
+                                                            default:
+                                                                statusClass = "bg-secondary";
+                                                                statusIcon = "help-circle";
+                                                                break;
+                                                        }
+                                                    }
+                                                    <span class="badge @statusClass">
+                                                        <i data-feather="@statusIcon" style="width: 12px; height: 12px;"></i>
+                                                        @item.TrangThai
+                                                    </span>
+
+                                                    @if (item.TrangThai == "Đang sửa chữa")
+                                                    {
+                                                        var elapsed = DateTime.Now - item.NgayBatDau;
+                                                        if (elapsed.TotalDays > 7)
+                                                        {
+                                                            <br>
+                                                            <small class="text-danger">
+                                                                <i data-feather="alert-triangle" style="width: 12px; height: 12px;"></i>
+                                                                Quá hạn
+                                                            </small>
+                                                        }
+                                                    }
+                                                </td>
+                                                <td>
+                                                    <div>
+                                                        <strong>@item.TenNguoiThucHien</strong>
+                                                      
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group btn-group-sm">
+                                                        @if (item.TrangThai == "Chờ sửa chữa")
+                                                        {
+                                                            <button type="button" class="btn btn-warning" title="Bắt đầu sửa chữa"
+                                                                    onclick="updateStatus('@item.MaSuaChua', 'Đang sửa chữa')">
+                                                                <i data-feather="play"></i>
+                                                            </button>
+                                                        }
+                                                        @if (item.TrangThai == "Đang sửa chữa")
+                                                        {
+                                                            <button type="button" class="btn btn-success" title="Hoàn thành"
+                                                                    onclick="completeRepair('@item.MaSuaChua')">
+                                                                <i data-feather="check"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-danger" title="Tạm dừng"
+                                                                    onclick="updateStatus('@item.MaSuaChua', 'Tạm dừng')">
+                                                                <i data-feather="pause"></i>
+                                                            </button>
+                                                        }
+                                                        @if (item.TrangThai == "Tạm dừng")
+                                                        {
+                                                            <button type="button" class="btn btn-info" title="Tiếp tục"
+                                                                    onclick="updateStatus('@item.MaSuaChua', 'Đang sửa chữa')">
+                                                                <i data-feather="play"></i>
+                                                            </button>
+                                                        }
+                                                        <button type="button" class="btn btn-info" title="Chi tiết"
+                                                                onclick="viewDetails('@item.MaSuaChua')">
+                                                            <i data-feather="eye"></i>
+                                                        </button>
+                                                        @if (item.TrangThai != "Hoàn thành")
+                                                        {
+                                                            <button type="button" class="btn btn-outline-primary" title="Chỉnh sửa"
+                                                                    onclick="editRepair('@item.MaSuaChua')">
+                                                                <i data-feather="edit"></i>
+                                                            </button>
+                                                        }
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            index++;
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <i data-feather="tool" size="64" class="text-muted mb-3"></i>
+                                <h5 class="text-muted">Chưa có phiếu sửa chữa nào</h5>
+                                <p class="text-muted">Hãy <a href="@Url.Action("Create", "SuaChua")">tạo phiếu sửa chữa đầu tiên</a> để bắt đầu quản lý.</p>
+                            </div>
+                        }
+                    </div>
+                    @if (Model?.Any() == true)
+                    {
+                        <div class="card-footer bg-light">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="text-muted">
+                                        <i data-feather="info" style="width: 16px; height: 16px;"></i>
+                                        Hiển thị @Model.Count() phiếu sửa chữa
+                                    </span>
+                                </div>
+                                <div>
+                                    <small class="text-muted">
+                                        Cập nhật lần cuối: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Urgent repairs alert -->
+        @if (Model?.Any() == true)
+        {
+            var urgentRepairs = Model.Where(x => x.TrangThai == "Đang sửa chữa" && (DateTime.Now - x.NgayBatDau).TotalDays > 7).ToList();
+            if (urgentRepairs.Any())
+            {
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card border-danger">
+                            <div class="card-header bg-danger text-white">
+                                <h6 class="mb-0">
+                                    <i data-feather="alert-triangle" class="me-2"></i>Cảnh báo: Sửa chữa quá hạn
+                                    <span class="badge bg-light text-dark ms-2">@urgentRepairs.Count phiếu</span>
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-3">Các phiếu sửa chữa sau đã vượt quá thời gian cho phép (7 ngày):</p>
+                                <div class="row">
+                                    @foreach (var repair in urgentRepairs.Take(6))
+                                    {
+                                        var overdueDays = (int)(DateTime.Now - repair.NgayBatDau).TotalDays;
+                                        <div class="col-md-6 col-lg-4 mb-3">
+                                            <div class="card border-warning">
+                                                <div class="card-body py-2">
+                                                    <h6 class="card-title mb-1">@repair.TenThietBi</h6>
+                                                    <p class="card-text mb-1">
+                                                        <span class="badge bg-danger">Quá @overdueDays ngày</span>
+                                                    </p>
+                                                    <small class="text-muted">Người thực hiện: @repair.TenNguoiThucHien</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                                @if (urgentRepairs.Count > 6)
+                                {
+                                    <p class="text-muted mb-0">
+                                        Và @(urgentRepairs.Count - 6) phiếu khác.
+                                        <a href="@Url.Action("InProgress", "SuaChua")">Xem tất cả phiếu đang sửa chữa</a>
+                                    </p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<!-- Modal hoàn thành sửa chữa -->
+<div class="modal fade" id="completeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i data-feather="check-circle"></i> Hoàn thành sửa chữa
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="completeForm">
+                    <input type="hidden" id="maSuaChua" />
+                    <div class="mb-3">
+                        <label class="form-label">Chi phí sửa chữa (VNĐ) <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i data-feather="dollar-sign"></i>
+                            </span>
+                            <input type="number" id="chiPhi" class="form-control" min="0" required placeholder="Nhập chi phí" />
+                            <span class="input-group-text">VNĐ</span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tình trạng sau sửa chữa <span class="text-danger">*</span></label>
+                        <select id="tinhTrangMoi" class="form-select" required>
+                            <option value="">-- Chọn tình trạng --</option>
+                            <option value="Tốt">Tốt - Hoạt động bình thường</option>
+                            <option value="Khá tốt">Khá tốt - Có thể sử dụng</option>
+                            <option value="Bình thường">Bình thường - Cần theo dõi</option>
+                            <option value="Cần theo dõi">Cần theo dõi - Vẫn có vấn đề</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mô tả chi tiết</label>
+                        <textarea id="moTaKetQua" class="form-control" rows="3"
+                                  placeholder="Mô tả về quá trình sửa chữa, linh kiện thay thế, kết quả..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" onclick="submitComplete()">
+                    <i data-feather="check"></i> Hoàn thành
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        function updateStatus(id, status) {
+            var action = status === 'Đang sửa chữa' ? 'bắt đầu sửa chữa' :
+                        status === 'Tạm dừng' ? 'tạm dừng' : 'cập nhật trạng thái';
+
+            Swal.fire({
+                title: 'Xác nhận',
+                text: `Bạn có chắc chắn muốn ${action} cho phiếu này?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Xác nhận',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("UpdateStatus", "SuaChua")',
+                        type: 'POST',
+                        data: { id: id, status: status },
+                        success: function(result) {
+                            if (result.success) {
+                                Swal.fire('Thành công!', result.message, 'success');
+                                location.reload();
+                            } else {
+                                Swal.fire('Lỗi!', result.message, 'error');
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Lỗi!', 'Có lỗi xảy ra khi cập nhật trạng thái', 'error');
+                        }
+                    });
+                }
+            });
+        }
+
+        function completeRepair(id) {
+            $('#maSuaChua').val(id);
+            $('#completeModal').modal('show');
+        }
+
+        function submitComplete() {
+            var id = $('#maSuaChua').val();
+            var chiPhi = $('#chiPhi').val();
+            var tinhTrangMoi = $('#tinhTrangMoi').val();
+            var moTa = $('#moTaKetQua').val();
+
+            if (!chiPhi || !tinhTrangMoi) {
+                Swal.fire('Lỗi!', 'Vui lòng nhập đầy đủ thông tin bắt buộc', 'warning');
+                return;
+            }
+
+            if (parseFloat(chiPhi) < 0) {
+                Swal.fire('Lỗi!', 'Chi phí phải lớn hơn hoặc bằng 0', 'warning');
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("Complete", "SuaChua")',
+                type: 'POST',
+                data: {
+                    id: id,
+                    chiPhi: chiPhi,
+                    tinhTrangMoi: tinhTrangMoi,
+                    moTa: moTa
+                },
+                success: function(result) {
+                    if (result.success) {
+                        $('#completeModal').modal('hide');
+                        Swal.fire('Thành công!', result.message, 'success');
+                        location.reload();
+                    } else {
+                        Swal.fire('Lỗi!', result.message, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Lỗi!', 'Có lỗi xảy ra khi hoàn thành sửa chữa', 'error');
+                }
+            });
+        }
+
+        function viewDetails(id) {
+            window.location.href = '@Url.Action("Details", "SuaChua")/' + id;
+        }
+
+        function editRepair(id) {
+            window.location.href = '@Url.Action("Edit", "SuaChua")/' + id;
+        }
+
+        function exportToExcel() {
+            var table = document.getElementById("suaChuaTable");
+            if (table) {
+                var wb = XLSX.utils.table_to_book(table, {sheet:"Danh sách sửa chữa"});
+                var filename = "DanhSachSuaChua_" + new Date().toISOString().split('T')[0];
+                XLSX.writeFile(wb, filename + ".xlsx");
+
+                Swal.fire('Thành công!', 'Xuất Excel thành công!', 'success');
+            } else {
+                Swal.fire('Lỗi!', 'Không có dữ liệu để xuất!', 'warning');
+            }
+        }
+
+        function printPage() {
+            window.print();
+        }
+
+        $(document).ready(function() {
+            // Set selected values for filters
+            $('select[name="trangThai"]').val('@ViewBag.TrangThai');
+            $('select[name="loaiSuaChua"]').val('@ViewBag.LoaiSuaChua');
+
+            // Initialize feather icons
+            feather.replace();
+
+            // Initialize DataTable for large datasets
+        @if (Model?.Count() > 10)
+        {
+            <text>
+                    $('#suaChuaTable').DataTable({
+                        "language": {
+                            "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/vi.json"
+                        },
+                        "pageLength": 25,
+                        "order": [[4, "desc"]], // Sort by start date desc
+                        "columnDefs": [
+                            { "orderable": false, "targets": [10] } // Disable sorting for action column
+                        ]
+                    });
+            </text>
+        }
+
+            // Add hover effects to statistics cards
+            $('.card.border-primary, .card.border-warning, .card.border-success, .card.border-info').hover(
+                function() { $(this).addClass('shadow-sm'); },
+                function() { $(this).removeClass('shadow-sm'); }
+            );
+
+            // Auto-refresh every 60 seconds for active repairs
+            setTimeout(function() {
+                if ($('.badge.bg-warning').length > 0) {
+                    location.reload();
+                }
+            }, 60000);
+
+            // Highlight overdue repairs
+            $('tr').each(function() {
+                var statusBadge = $(this).find('.badge.bg-warning');
+                if (statusBadge.length > 0 && statusBadge.text().includes('Đang sửa chữa')) {
+                    var alertIcon = $(this).find('.text-danger .fa-exclamation-triangle, .text-danger [data-feather="alert-triangle"]');
+                    if (alertIcon.length > 0) {
+                        $(this).addClass('table-danger');
+                    }
+                }
+            });
+
+            // Format currency inputs
+            $('#chiPhi').on('input', function() {
+                var value = $(this).val();
+                if (value) {
+                    // Update display format (optional)
+                    var formatted = Number(value).toLocaleString('vi-VN');
+                    $(this).attr('title', formatted + ' VNĐ');
+                }
+            });
+        });
+    </script>
+}

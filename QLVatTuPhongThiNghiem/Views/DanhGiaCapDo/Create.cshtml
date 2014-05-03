@@ -1,0 +1,594 @@
+﻿@model QLVatTuPhongThiNghiem.Models.ViewModels.DanhGiaCapDoViewModel
+@{
+    ViewData["Title"] = "Thêm đánh giá cấp độ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>Thêm đánh giá cấp độ</h3>
+                </div>
+                <div class="col-6">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index", "Dashboard")">
+                                <i data-feather="home"></i>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index", "DanhGiaCapDo")">Đánh giá cấp độ</a>
+                        </li>
+                        <li class="breadcrumb-item active">Thêm mới</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-xl-10 col-lg-12">
+                <!-- Alert Messages -->
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i data-feather="check-circle"></i>
+                        @TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i data-feather="alert-circle"></i>
+                        @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                <!-- Main Form -->
+                <div class="card">
+                    <div class="card-header bg-success">
+                        <h5 class="text-white mb-0">
+                            <i data-feather="star" class="me-2"></i>Thông tin đánh giá
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="Create" method="post" class="needs-validation" novalidate>
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                            <!-- Thông tin người đánh giá -->
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <div class="alert alert-info">
+                                        <h6><i data-feather="user"></i> Thông tin người đánh giá</h6>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <strong>Họ tên:</strong> @ViewBag.CurrentUser?.HoTen
+                                            </div>
+                                            <div class="col-md-6">
+                                                <strong>Email:</strong> @ViewBag.CurrentUser?.Email
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">Thông tin này sẽ được lưu cùng với đánh giá</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Chọn thiết bị -->
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label asp-for="MaTTB" class="form-label">
+                                        Chọn thiết bị cần đánh giá <span class="text-danger">*</span>
+                                    </label>
+                                    <select asp-for="MaTTB" class="form-select" id="thietBiSelect" required>
+                                        <option value="">-- Chọn thiết bị --</option>
+                                        @if (ViewBag.ThietBiList != null)
+                                        {
+                                            @foreach (var item in (IEnumerable<QLVatTuPhongThiNghiem.Models.Entities.TrangTB>)ViewBag.ThietBiList)
+                                            {
+                                                <option value="@item.MaTTB"
+                                                        data-phong="@item.PhongMay?.TenPhongMay"
+                                                        data-loai="@item.Loai?.TenLoai"
+                                                        data-thuonghieu="@item.ThuongHieu?.TenThuongHieu"
+                                                        data-tinhtrang="@item.TinhTrang"
+                                                        data-ngaynhap="@item.NgayNhap.ToString("dd/MM/yyyy")">
+                                                    @item.MaTTB - @item.Loai?.TenLoai @item.ThuongHieu?.TenThuongHieu
+                                                </option>
+                                            }
+                                        }
+                                    </select>
+                                    <span asp-validation-for="MaTTB" class="text-danger"></span>
+                                    <div class="invalid-feedback">
+                                        Vui lòng chọn thiết bị cần đánh giá.
+                                    </div>
+                                    <small class="form-text text-muted">
+                                        Chọn thiết bị mà bạn muốn đánh giá chất lượng và hiệu suất
+                                    </small>
+                                </div>
+                            </div>
+
+                            <!-- Thông tin thiết bị được chọn -->
+                            <div class="row" id="thietBiInfo" style="display: none;">
+                                <div class="col-12 mb-3">
+                                    <div class="alert alert-light border">
+                                        <h6><i data-feather="box"></i> Thông tin thiết bị được chọn</h6>
+                                        <div id="thietBiDetails">
+                                            <!-- Thông tin sẽ được load bằng JavaScript -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Đánh giá cấp độ -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="CapDo" class="form-label">
+                                        Cấp độ đánh giá <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="rating-container">
+                                        <div class="rating-input mb-3">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                <input type="radio" asp-for="CapDo" value="@i" id="star@i" />
+                                                <label for="star@i" class="star" title="@i sao">
+                                                    <i class="fa fa-star"></i>
+                                                </label>
+                                            }
+                                        </div>
+                                        <div id="ratingDescription" class="text-muted">
+                                            Nhấn vào ngôi sao để đánh giá
+                                        </div>
+                                    </div>
+                                    <span asp-validation-for="CapDo" class="text-danger"></span>
+                                    <div class="invalid-feedback">
+                                        Vui lòng chọn cấp độ đánh giá.
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <div class="card border-info">
+                                        <div class="card-header bg-info text-white py-2">
+                                            <h6 class="mb-0"><i data-feather="help-circle"></i> Hướng dẫn đánh giá</h6>
+                                        </div>
+                                        <div class="card-body py-2">
+                                            <div class="rating-guide">
+                                                <div class="rating-item">
+                                                    <span class="rating-stars">⭐⭐⭐⭐⭐</span>
+                                                    <span class="rating-text">Rất tốt - Hoạt động xuất sắc</span>
+                                                </div>
+                                                <div class="rating-item">
+                                                    <span class="rating-stars">⭐⭐⭐⭐</span>
+                                                    <span class="rating-text">Tốt - Hoạt động ổn định</span>
+                                                </div>
+                                                <div class="rating-item">
+                                                    <span class="rating-stars">⭐⭐⭐</span>
+                                                    <span class="rating-text">Trung bình - Có thể cải thiện</span>
+                                                </div>
+                                                <div class="rating-item">
+                                                    <span class="rating-stars">⭐⭐</span>
+                                                    <span class="rating-text">Kém - Cần sửa chữa</span>
+                                                </div>
+                                                <div class="rating-item">
+                                                    <span class="rating-stars">⭐</span>
+                                                    <span class="rating-text">Rất kém - Không hoạt động</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tiêu chí đánh giá -->
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <label class="form-label">Tiêu chí đánh giá cụ thể</label>
+                                    <div class="card border-secondary">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="TieuChi" value="Hiệu suất" id="tc1">
+                                                        <label class="form-check-label" for="tc1">Hiệu suất hoạt động</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="TieuChi" value="Độ bền" id="tc2">
+                                                        <label class="form-check-label" for="tc2">Độ bền và ổn định</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="TieuChi" value="Dễ sử dụng" id="tc3">
+                                                        <label class="form-check-label" for="tc3">Dễ sử dụng</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="TieuChi" value="Tốc độ" id="tc4">
+                                                        <label class="form-check-label" for="tc4">Tốc độ xử lý</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="TieuChi" value="Chất lượng" id="tc5">
+                                                        <label class="form-check-label" for="tc5">Chất lượng kết quả</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="TieuChi" value="Bảo trì" id="tc6">
+                                                        <label class="form-check-label" for="tc6">Dễ bảo trì</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="TieuChi" value="An toàn" id="tc7">
+                                                        <label class="form-check-label" for="tc7">An toàn sử dụng</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="TieuChi" value="Tiết kiệm" id="tc8">
+                                                        <label class="form-check-label" for="tc8">Tiết kiệm năng lượng</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="TieuChi" value="Khác" id="tc9">
+                                                        <label class="form-check-label" for="tc9">Khác</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <small class="form-text text-muted">
+                                        Chọn các tiêu chí mà bạn đã đánh giá (không bắt buộc)
+                                    </small>
+                                </div>
+                            </div>
+
+                            <!-- Ghi chú -->
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <label asp-for="GhiChu" class="form-label">Ghi chú chi tiết</label>
+                                    <textarea asp-for="GhiChu" class="form-control" rows="4"
+                                              placeholder="Mô tả chi tiết về tình trạng thiết bị, những vấn đề gặp phải, đề xuất cải thiện..."></textarea>
+                                    <span asp-validation-for="GhiChu" class="text-danger"></span>
+                                    <small class="form-text text-muted">
+                                        Chia sẻ kinh nghiệm sử dụng và những nhận xét cụ thể về thiết bị
+                                    </small>
+                                </div>
+                            </div>
+
+                            <!-- Đánh giá hiện tại -->
+                            <div id="currentRating" class="alert alert-warning" style="display: none;">
+                                <h6><i data-feather="info"></i> Cấp độ hiện tại của thiết bị:</h6>
+                                <div id="currentRatingContent">
+                                    <!-- Content will be loaded by JavaScript -->
+                                </div>
+                            </div>
+
+                            <!-- Preview đánh giá -->
+                            <div class="row" id="previewSection" style="display: none;">
+                                <div class="col-12 mb-3">
+                                    <div class="alert alert-success">
+                                        <h6><i data-feather="eye"></i> Xem trước đánh giá</h6>
+                                        <div id="previewContent">
+                                            <!-- Content will be populated by JavaScript -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action buttons -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <hr>
+                                    <div class="d-flex justify-content-between">
+                                        <a asp-action="Index" class="btn btn-secondary">
+                                            <i data-feather="arrow-left"></i> Quay lại
+                                        </a>
+                                        <div>
+                                            <button type="button" class="btn btn-info me-2" id="previewBtn">
+                                                <i data-feather="eye"></i> Xem trước
+                                            </button>
+                                            <button type="reset" class="btn btn-warning me-2">
+                                                <i data-feather="refresh-cw"></i> Làm mới
+                                            </button>
+                                            <button type="submit" class="btn btn-success">
+                                                <i data-feather="star"></i> Lưu đánh giá
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hướng dẫn chi tiết -->
+        <div class="row justify-content-center mt-3">
+            <div class="col-xl-10 col-lg-12">
+                <div class="card border-info">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0">
+                            <i data-feather="help-circle" class="me-2"></i>Hướng dẫn đánh giá chi tiết
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Cách đánh giá hiệu quả:</h6>
+                                <ul class="list-unstyled text-muted">
+                                    <li>• <strong>Quan sát thực tế:</strong> Sử dụng thiết bị trong điều kiện thực</li>
+                                    <li>• <strong>Đo lường cụ thể:</strong> Thời gian phản hồi, độ chính xác</li>
+                                    <li>• <strong>So sánh:</strong> Với thiết bị tương tự hoặc tiêu chuẩn</li>
+                                    <li>• <strong>Ghi nhận vấn đề:</strong> Lỗi, trục trặc nếu có</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Lưu ý quan trọng:</h6>
+                                <ul class="list-unstyled text-muted">
+                                    <li>• Đánh giá khách quan, dựa trên thực tế</li>
+                                    <li>• Ghi chú cụ thể để hỗ trợ người khác</li>
+                                    <li>• Cập nhật đánh giá khi có thay đổi</li>
+                                    <li>• Báo cáo vấn đề nghiêm trọng ngay lập tức</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mẫu đánh giá nhanh -->
+        <div class="row justify-content-center mt-3">
+            <div class="col-xl-10 col-lg-12">
+                <div class="card border-secondary">
+                    <div class="card-header bg-secondary text-white">
+                        <h6 class="mb-0">
+                            <i data-feather="zap" class="me-2"></i>Mẫu đánh giá nhanh
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="button" class="btn btn-outline-success btn-sm quick-rating"
+                                    data-rating="5" data-note="Thiết bị hoạt động rất tốt, không có vấn đề gì.">
+                                <i data-feather="star"></i> Rất tốt (5⭐)
+                            </button>
+                            <button type="button" class="btn btn-outline-primary btn-sm quick-rating"
+                                    data-rating="4" data-note="Thiết bị hoạt động tốt, ổn định.">
+                                <i data-feather="thumbs-up"></i> Tốt (4⭐)
+                            </button>
+                            <button type="button" class="btn btn-outline-warning btn-sm quick-rating"
+                                    data-rating="3" data-note="Thiết bị hoạt động bình thường, có thể cải thiện.">
+                                <i data-feather="meh"></i> Trung bình (3⭐)
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-sm quick-rating"
+                                    data-rating="2" data-note="Thiết bị có vấn đề, cần kiểm tra và sửa chữa.">
+                                <i data-feather="thumbs-down"></i> Cần sửa chữa (2⭐)
+                            </button>
+                        </div>
+                        <small class="text-muted mt-2 d-block">
+                            Nhấn vào các nút trên để nhanh chóng đánh giá với ghi chú mẫu
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script {
+    <style>
+        .rating-input {
+            direction: rtl;
+            display: inline-flex;
+            gap: 5px;
+        }
+
+            .rating-input input[type="radio"] {
+                display: none;
+            }
+
+            .rating-input .star {
+                cursor: pointer;
+                width: 40px;
+                height: 40px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                color: #ddd;
+                font-size: 24px;
+                transition: color 0.2s;
+            }
+
+                .rating-input .star:hover,
+                .rating-input .star:hover ~ .star,
+                .rating-input input[type="radio"]:checked ~ .star {
+                    color: #ffc107;
+                }
+
+        .rating-guide .rating-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2px 0;
+            font-size: 0.9em;
+        }
+
+        .rating-stars {
+            font-size: 14px;
+        }
+
+        .rating-text {
+            color: #666;
+        }
+    </style>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize feather icons
+            feather.replace();
+
+            // Form validation
+            const form = document.querySelector('.needs-validation');
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            });
+
+            // Load equipment info when selection changes
+            $('#thietBiSelect').change(function() {
+                var selected = $(this).find('option:selected');
+                var maTTB = $(this).val();
+
+                if (maTTB) {
+                    var thietBiHtml = `
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Mã thiết bị:</strong> ${maTTB}<br>
+                                <strong>Phòng máy:</strong> ${selected.data('phong')}<br>
+                                <strong>Loại:</strong> ${selected.data('loai')}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Thương hiệu:</strong> ${selected.data('thuonghieu')}<br>
+                                <strong>Tình trạng:</strong> <span class="badge bg-info">${selected.data('tinhtrang')}</span><br>
+                                <strong>Ngày nhập:</strong> ${selected.data('ngaynhap')}
+                            </div>
+                        </div>
+                    `;
+
+                    $('#thietBiDetails').html(thietBiHtml);
+                    $('#thietBiInfo').show();
+
+                    // Load current rating
+                    loadCurrentRating(maTTB);
+                } else {
+                    $('#thietBiInfo').hide();
+                    $('#currentRating').hide();
+                }
+            });
+
+            // Rating change handler
+            $('input[name="CapDo"]').change(function() {
+                var rating = $(this).val();
+                var descriptions = {
+                    1: "⭐ Rất kém - Thiết bị không hoạt động hoặc có nhiều lỗi nghiêm trọng",
+                    2: "⭐⭐ Kém - Thiết bị có vấn đề, cần sửa chữa ngay",
+                    3: "⭐⭐⭐ Trung bình - Thiết bị hoạt động nhưng có thể cải thiện",
+                    4: "⭐⭐⭐⭐ Tốt - Thiết bị hoạt động ổn định, hiệu quả",
+                    5: "⭐⭐⭐⭐⭐ Rất tốt - Thiết bị hoạt động xuất sắc, không có vấn đề"
+                };
+
+                $('#ratingDescription').html(descriptions[rating] || "Nhấn vào ngôi sao để đánh giá");
+            });
+
+            // Quick rating buttons
+            $('.quick-rating').click(function() {
+                var rating = $(this).data('rating');
+                var note = $(this).data('note');
+
+                $(`input[name="CapDo"][value="${rating}"]`).prop('checked', true).trigger('change');
+                $('#GhiChu').val(note);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Đã áp dụng mẫu!',
+                    text: `Đánh giá ${rating} sao với ghi chú mẫu`,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            });
+
+            // Preview functionality
+            $('#previewBtn').click(function() {
+                var thietBi = $('#thietBiSelect option:selected').text();
+                var rating = $('input[name="CapDo"]:checked').val();
+                var ghiChu = $('#GhiChu').val();
+                var tieuChi = [];
+
+                $('input[name="TieuChi"]:checked').each(function() {
+                    tieuChi.push($(this).val());
+                });
+
+                if (!thietBi || thietBi === '-- Chọn thiết bị --' || !rating) {
+                    Swal.fire('Lỗi!', 'Vui lòng chọn thiết bị và đánh giá trước khi xem trước!', 'warning');
+                    return;
+                }
+
+                var stars = '';
+                for (var i = 1; i <= 5; i++) {
+                    stars += i <= rating ? '⭐' : '☆';
+                }
+
+                var previewHtml = `
+                    <div class="row">
+                        <div class="col-md-8">
+                            <strong>Thiết bị:</strong> ${thietBi}<br>
+                            <strong>Cấp độ:</strong> ${stars} (${rating}/5)<br>
+                            <strong>Tiêu chí:</strong> ${tieuChi.length > 0 ? tieuChi.join(', ') : 'Không có'}<br>
+                            <strong>Ghi chú:</strong> ${ghiChu || 'Không có'}
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Người đánh giá:</strong> @ViewBag.CurrentUser?.HoTen<br>
+                            <strong>Thời gian:</strong> ${new Date().toLocaleString('vi-VN')}
+                        </div>
+                    </div>
+                `;
+
+                $('#previewContent').html(previewHtml);
+                $('#previewSection').slideDown();
+            });
+
+            // Real-time validation
+            $('#thietBiSelect, input[name="CapDo"]').on('change', function() {
+                if ($(this).val()) {
+                    $(this).removeClass('is-invalid').addClass('is-valid');
+                } else if ($(this).attr('required')) {
+                    $(this).removeClass('is-valid').addClass('is-invalid');
+                }
+            });
+
+            // Auto-focus first select
+            $('#thietBiSelect').focus();
+        });
+
+        function loadCurrentRating(maTTB) {
+            $.ajax({
+                url: '@Url.Action("GetCapDoThietBi", "DanhGiaCapDo")',
+                type: 'GET',
+                data: { maTTB: maTTB },
+                success: function(data) {
+                    if (data && data.capDo) {
+                        var stars = '';
+                        for (var i = 1; i <= 5; i++) {
+                            stars += i <= data.capDo ? '⭐' : '☆';
+                        }
+
+                        $('#currentRatingContent').html(`
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Cấp độ hiện tại:</strong> ${stars} (${data.capDo}/5)<br>
+                                    <strong>Ngày đánh giá:</strong> ${new Date(data.ngayDanhGia).toLocaleDateString('vi-VN')}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Người đánh giá:</strong> ${data.nguoiDanhGia}<br>
+                                    ${data.ghiChu ? '<strong>Ghi chú cũ:</strong> ' + data.ghiChu : ''}
+                                </div>
+                            </div>
+                        `);
+                        $('#currentRating').show();
+                    } else {
+                        $('#currentRating').hide();
+                    }
+                },
+                error: function() {
+                    $('#currentRating').hide();
+                }
+            });
+        }
+    </script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

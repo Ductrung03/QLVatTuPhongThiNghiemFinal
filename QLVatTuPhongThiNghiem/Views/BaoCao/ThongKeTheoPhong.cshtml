@@ -1,0 +1,563 @@
+﻿@model IEnumerable<QLVatTuPhongThiNghiem.Models.ViewModels.ThongKeTheoPhongViewModel>
+@{
+    ViewData["Title"] = "Thống kê thiết bị theo phòng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>Thống kê thiết bị theo phòng</h3>
+                </div>
+                <div class="col-6">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index", "Dashboard")">
+                                <i data-feather="home"></i>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">Báo cáo</li>
+                        <li class="breadcrumb-item active">Thống kê theo phòng</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <!-- Alert Messages -->
+        <div class="row">
+            <div class="col-sm-12">
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i data-feather="check-circle"></i>
+                        @TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i data-feather="alert-circle"></i>
+                        @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Filter Card -->
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header bg-primary">
+                        <h5 class="text-white mb-0">
+                            <i data-feather="filter" class="me-2"></i>Bộ lọc báo cáo
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="get" asp-action="ThongKeTheoPhong" class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Loại thiết bị</label>
+                                <select class="form-select" name="maLoai">
+                                    <option value="">-- Tất cả loại --</option>
+                                    @if (ViewBag.LoaiList != null)
+                                    {
+                                        @foreach (var item in (IEnumerable<QLVatTuPhongThiNghiem.Models.Entities.Loai>)ViewBag.LoaiList)
+                                        {
+                                            <option value="@item.MaLoai">@item.TenLoai</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Thương hiệu</label>
+                                <select class="form-select" name="maThuongHieu">
+                                    <option value="">-- Tất cả thương hiệu --</option>
+                                    @if (ViewBag.ThuongHieuList != null)
+                                    {
+                                        @foreach (var item in (IEnumerable<QLVatTuPhongThiNghiem.Models.Entities.ThuongHieu>)ViewBag.ThuongHieuList)
+                                        {
+                                            <option value="@item.MaThuongHieu">@item.TenThuongHieu</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <div class="d-grid w-100">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i data-feather="bar-chart-2"></i> Tạo báo cáo
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="row mb-3">
+            <div class="col-sm-12">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <a href="@Url.Action("SuDungTheoThang", "BaoCao")" class="btn btn-info">
+                            <i data-feather="trending-up"></i> Sử dụng theo tháng
+                        </a>
+                        <a href="@Url.Action("ChiPhiSuaChua", "BaoCao")" class="btn btn-warning">
+                            <i data-feather="dollar-sign"></i> Chi phí sửa chữa
+                        </a>
+                        <a href="@Url.Action("Index", "Dashboard")" class="btn btn-secondary">
+                            <i data-feather="arrow-left"></i> Về Dashboard
+                        </a>
+                    </div>
+                    <div>
+                        <button class="btn btn-success" onclick="exportToExcel()">
+                            <i data-feather="download"></i> Xuất Excel
+                        </button>
+                        <button class="btn btn-outline-primary" onclick="printReport()">
+                            <i data-feather="printer"></i> In báo cáo
+                        </button>
+                        <button class="btn btn-outline-info" onclick="exportChart()">
+                            <i data-feather="image"></i> Xuất biểu đồ
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Summary -->
+        @if (Model?.Any() == true)
+        {
+            <div class="row mb-4">
+                <div class="col-xl-3 col-md-6">
+                    <div class="card border-primary">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h4 class="text-primary mb-0">@Model.Count()</h4>
+                                    <p class="text-muted mb-0">Tổng phòng máy</p>
+                                </div>
+                                <i data-feather="home" class="text-primary" style="width: 48px; height: 48px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="card border-success">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h4 class="text-success mb-0">@Model.Sum(x => x.TongThietBi)</h4>
+                                    <p class="text-muted mb-0">Tổng thiết bị</p>
+                                </div>
+                                <i data-feather="box" class="text-success" style="width: 48px; height: 48px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="card border-warning">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h4 class="text-warning mb-0">@Model.Sum(x => x.ThietBiHong + x.ThietBiDangSua)</h4>
+                                    <p class="text-muted mb-0">Cần xử lý</p>
+                                </div>
+                                <i data-feather="alert-triangle" class="text-warning" style="width: 48px; height: 48px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="card border-info">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h4 class="text-info mb-0">@String.Format("{0:N0}M", Model.Sum(x => x.GiaTriTrungBinh) / 1000000)</h4>
+                                    <p class="text-muted mb-0">Tổng giá trị (VNĐ)</p>
+                                </div>
+                                <i data-feather="dollar-sign" class="text-info" style="width: 48px; height: 48px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Charts -->
+        @if (Model?.Any() == true)
+        {
+            <div class="row mb-4">
+                <div class="col-xl-8">
+                    <div class="card">
+                        <div class="card-header bg-info">
+                            <h5 class="text-white mb-0">
+                                <i data-feather="bar-chart-2" class="me-2"></i>Biểu đồ thiết bị theo phòng máy
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="equipmentChart" height="120"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4">
+                    <div class="card">
+                        <div class="card-header bg-success">
+                            <h5 class="text-white mb-0">
+                                <i data-feather="pie-chart" class="me-2"></i>Tỷ lệ tình trạng
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="statusChart" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Main Table -->
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header bg-dark">
+                        <h5 class="text-white mb-0">
+                            <i data-feather="list" class="me-2"></i>Chi tiết thống kê theo phòng máy
+                            <span class="badge bg-light text-dark ms-2">@Model.Count() phòng máy</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        @if (Model?.Any() == true)
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="reportTable">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>STT</th>
+                                            <th>Phòng máy</th>
+                                            <th>Tổng thiết bị</th>
+                                            <th>Thiết bị tốt</th>
+                                            <th>Thiết bị hỏng</th>
+                                            <th>Đang sửa chữa</th>
+                                            <th>Giá trị TB (VNĐ)</th>
+                                            <th>Tỷ lệ tốt (%)</th>
+                                            <th>Đánh giá</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int index = 1;
+                                        }
+                                        @foreach (var item in Model.OrderByDescending(x => x.TongThietBi))
+                                        {
+                                            <tr>
+                                                <td>@index</td>
+                                                <td>
+                                                    <div>
+                                                        <strong>@item.TenPhongMay</strong>
+                                                      
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-primary fs-6">@item.TongThietBi</span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-success fs-6">@item.ThietBiTot</span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-danger fs-6">@item.ThietBiHong</span>
+                                                    @if (item.ThietBiHong > 0)
+                                                    {
+                                                        <br>
+                                                        <small class="text-danger">Cần xử lý!</small>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-warning fs-6">@item.ThietBiDangSua</span>
+                                                    @if (item.ThietBiDangSua > 0)
+                                                    {
+                                                        <br>
+                                                        <small class="text-warning">Đang bảo trì</small>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    <strong>@String.Format("{0:N0}", item.GiaTriTrungBinh)</strong>
+                                                    <small class="text-muted d-block">VNĐ</small>
+                                                </td>
+                                                <td>
+                                                    @{
+                                                        var tyLe = item.TongThietBi > 0 ? (double)item.ThietBiTot / item.TongThietBi * 100 : 0;
+                                                        string progressClass = tyLe >= 80 ? "bg-success" : tyLe >= 60 ? "bg-warning" : "bg-danger";
+                                                    }
+                                                    <div class="progress mb-1" style="height: 20px;">
+                                                        <div class="progress-bar @progressClass" role="progressbar" style="width: @tyLe%">
+                                                            @String.Format("{0:N1}%", tyLe)
+                                                        </div>
+                                                    </div>
+                                                    <small class="text-muted">@item.ThietBiTot/@item.TongThietBi</small>
+                                                </td>
+                                                <td>
+                                                    @{
+                                                        string evaluationClass = tyLe >= 90 ? "bg-success" : tyLe >= 75 ? "bg-info" : tyLe >= 60 ? "bg-warning" : "bg-danger";
+                                                        string evaluationText = tyLe >= 90 ? "Xuất sắc" : tyLe >= 75 ? "Tốt" : tyLe >= 60 ? "Trung bình" : "Cần cải thiện";
+                                                        string evaluationIcon = tyLe >= 90 ? "award" : tyLe >= 75 ? "thumbs-up" : tyLe >= 60 ? "meh" : "alert-triangle";
+                                                    }
+                                                    <span class="badge @evaluationClass">
+                                                        <i data-feather="@evaluationIcon" style="width: 12px; height: 12px;"></i>
+                                                        @evaluationText
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            index++;
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <i data-feather="bar-chart-2" size="64" class="text-muted mb-3"></i>
+                                <h5 class="text-muted">Không có dữ liệu thống kê</h5>
+                                <p class="text-muted">
+                                    Thay đổi bộ lọc hoặc
+                                    <a href="@Url.Action("Index", "TrangTB")">thêm thiết bị</a>
+                                    để xem thống kê.
+                                </p>
+                            </div>
+                        }
+                    </div>
+                    @if (Model?.Any() == true)
+                    {
+                        <div class="card-footer bg-light">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="text-muted">
+                                        <i data-feather="info" style="width: 16px; height: 16px;"></i>
+                                        Báo cáo được tạo lúc: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
+                                    </span>
+                                </div>
+                                <div>
+                                    <small class="text-muted">
+                                        Tổng: @Model.Sum(x => x.TongThietBi) thiết bị |
+                                        Tốt: @Model.Sum(x => x.ThietBiTot) |
+                                        Hỏng: @Model.Sum(x => x.ThietBiHong)
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommendations -->
+        @if (Model?.Any() == true)
+        {
+            var phongCanCaiThien = Model.Where(x => x.TongThietBi > 0 && (double)x.ThietBiTot / x.TongThietBi * 100 < 70).ToList();
+            if (phongCanCaiThien.Any())
+            {
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card border-warning">
+                            <div class="card-header bg-warning text-dark">
+                                <h6 class="mb-0">
+                                    <i data-feather="alert-triangle" class="me-2"></i>Khuyến nghị cải thiện
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-3">Các phòng máy cần được chú ý và cải thiện:</p>
+                                <div class="row">
+                                    @foreach (var phong in phongCanCaiThien)
+                                    {
+                                        var tyLe = (double)phong.ThietBiTot / phong.TongThietBi * 100;
+                                        <div class="col-md-6 col-lg-4 mb-3">
+                                            <div class="card border-warning">
+                                                <div class="card-body py-2">
+                                                    <h6 class="card-title mb-1">@phong.TenPhongMay</h6>
+                                                    <p class="card-text mb-1">
+                                                        <span class="badge bg-danger">@String.Format("{0:N1}%", tyLe) tỷ lệ tốt</span>
+                                                    </p>
+                                                    <small class="text-muted">
+                                                        @phong.ThietBiHong thiết bị hỏng, @phong.ThietBiDangSua đang sửa
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@section Script {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Initialize feather icons
+            feather.replace();
+
+            // Create charts if data exists
+        @if (Model?.Any() == true)
+        {
+            <text>
+                    // Equipment Chart
+                    var ctx = document.getElementById('equipmentChart').getContext('2d');
+                    var chartData = {
+                        labels: [@Html.Raw(string.Join(",", Model?.Select(x => $"'{x.TenPhongMay}'") ?? new string[0]))],
+                        datasets: [
+                            {
+                                label: 'Thiết bị tốt',
+                                data: [@Html.Raw(string.Join(",", Model?.Select(x => x.ThietBiTot.ToString()) ?? new string[0]))],
+                                backgroundColor: 'rgba(40, 167, 69, 0.8)',
+                                borderColor: 'rgba(40, 167, 69, 1)',
+                                borderWidth: 2
+                            },
+                            {
+                                label: 'Thiết bị hỏng',
+                                data: [@Html.Raw(string.Join(",", Model?.Select(x => x.ThietBiHong.ToString()) ?? new string[0]))],
+                                backgroundColor: 'rgba(220, 53, 69, 0.8)',
+                                borderColor: 'rgba(220, 53, 69, 1)',
+                                borderWidth: 2
+                            },
+                            {
+                                label: 'Đang sửa chữa',
+                                data: [@Html.Raw(string.Join(",", Model?.Select(x => x.ThietBiDangSua.ToString()) ?? new string[0]))],
+                                backgroundColor: 'rgba(255, 193, 7, 0.8)',
+                                borderColor: 'rgba(255, 193, 7, 1)',
+                                borderWidth: 2
+                            }
+                        ]
+                    };
+
+                    var equipmentChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: chartData,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: { stepSize: 1 }
+                                }
+                            },
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Thống kê thiết bị theo phòng máy'
+                                },
+                                legend: {
+                                    display: true,
+                                    position: 'top'
+                                }
+                            }
+                        }
+                    });
+
+                    // Status Chart
+                    var statusCtx = document.getElementById('statusChart').getContext('2d');
+                    var totalGood = @Model.Sum(x => x.ThietBiTot);
+                    var totalBroken = @Model.Sum(x => x.ThietBiHong);
+                    var totalRepairing = @Model.Sum(x => x.ThietBiDangSua);
+
+                    var statusChart = new Chart(statusCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Thiết bị tốt', 'Thiết bị hỏng', 'Đang sửa chữa'],
+                            datasets: [{
+                                data: [totalGood, totalBroken, totalRepairing],
+                                backgroundColor: [
+                                    'rgba(40, 167, 69, 0.8)',
+                                    'rgba(220, 53, 69, 0.8)',
+                                    'rgba(255, 193, 7, 0.8)'
+                                ],
+                                borderColor: [
+                                    'rgba(40, 167, 69, 1)',
+                                    'rgba(220, 53, 69, 1)',
+                                    'rgba(255, 193, 7, 1)'
+                                ],
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom'
+                                }
+                            }
+                        }
+                    });
+
+                    window.equipmentChart = equipmentChart;
+                    window.statusChart = statusChart;
+            </text>
+        }
+
+            // Initialize DataTable
+        @if (Model?.Count() > 5)
+        {
+            <text>
+                    $('#reportTable').DataTable({
+                        "language": {
+                            "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/vi.json"
+                        },
+                        "pageLength": 15,
+                        "order": [[2, "desc"]], // Sort by total equipment desc
+                        "columnDefs": [
+                            { "orderable": false, "targets": [7, 8] }
+                        ]
+                    });
+            </text>
+        }
+        });
+
+        function exportToExcel() {
+            var table = document.getElementById("reportTable");
+            if (table) {
+                var wb = XLSX.utils.table_to_book(table, {sheet:"Thống kê theo phòng"});
+                var filename = "ThongKeTheoPhong_" + new Date().toISOString().split('T')[0];
+                XLSX.writeFile(wb, filename + ".xlsx");
+
+                Swal.fire('Thành công!', 'Xuất Excel thành công!', 'success');
+            } else {
+                Swal.fire('Lỗi!', 'Không có dữ liệu để xuất!', 'warning');
+            }
+        }
+
+        function printReport() {
+            window.print();
+        }
+
+        function exportChart() {
+            var element = document.querySelector('.container-fluid');
+            html2canvas(element, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true
+            }).then(function(canvas) {
+                var link = document.createElement('a');
+                link.download = 'ThongKeTheoPhong_' + new Date().toISOString().split('T')[0] + '.png';
+                link.href = canvas.toDataURL();
+                link.click();
+
+                Swal.fire('Thành công!', 'Xuất biểu đồ thành công!', 'success');
+            }).catch(function(error) {
+                console.error('Error:', error);
+                Swal.fire('Lỗi!', 'Có lỗi khi xuất biểu đồ!', 'error');
+            });
+        }
+    </script>
+}

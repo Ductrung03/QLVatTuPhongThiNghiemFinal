@@ -1,0 +1,117 @@
+﻿@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "Báo cáo tồn kho";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>Báo cáo tồn kho</h3>
+                </div>
+                <div class="col-6">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Dashboard")"><i data-feather="home"></i></a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "XuatNhapTon")">Xuất nhập tồn</a></li>
+                        <li class="breadcrumb-item active">Báo cáo tồn kho</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Báo cáo tồn kho thiết bị</h5>
+                        <div class="card-header-right">
+                            <form method="get" class="d-inline">
+                                <select name="maPhongMay" class="form-control d-inline" style="width: auto;" onchange="this.form.submit()">
+                                    <option value="">-- Tất cả phòng --</option>
+                                    @if (ViewBag.PhongMayList != null)
+                                    {
+                                        @foreach (var item in (IEnumerable<QLVatTuPhongThiNghiem.Models.Entities.PhongMay>)ViewBag.PhongMayList)
+                                        {
+                                            <option value="@item.MaPhongMay" selected="@(item.MaPhongMay == ViewBag.SelectedPhongMay)">
+                                                @item.TenPhongMay
+                                            </option>
+                                        }
+                                    }
+                                </select>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Mã TB</th>
+                                        <th>Phòng máy</th>
+                                        <th>Loại thiết bị</th>
+                                        <th>Thương hiệu</th>
+                                        <th>Tổng nhập</th>
+                                        <th>Tổng xuất</th>
+                                        <th>Tồn kho</th>
+                                        <th>Tình trạng</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model?.Any() == true)
+                                    {
+                                        @foreach (var item in Model)
+                                        {
+                                            <tr>
+                                                <td>@item.MaTTB</td>
+                                                <td>@item.TenPhongMay</td>
+                                                <td>@item.TenLoai</td>
+                                                <td>@item.TenThuongHieu</td>
+                                                <td><span class="badge badge-success">+@item.TongNhap</span></td>
+                                                <td><span class="badge badge-warning">-@item.TongXuat</span></td>
+                                                <td>
+                                                    <span class="badge @(item.TonKho > 0 ? "badge-primary" : "badge-danger")">
+                                                        @item.TonKho
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    @if (item.TinhTrang == "Tốt")
+                                                    {
+                                                        <span class="badge badge-success">@item.TinhTrang</span>
+                                                    }
+                                                    else if (item.TinhTrang == "Hỏng")
+                                                    {
+                                                        <span class="badge badge-danger">@item.TinhTrang</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge badge-secondary">@item.TinhTrang</span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="8" class="text-center">Không có dữ liệu</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        feather.replace();
+    });
+</script>

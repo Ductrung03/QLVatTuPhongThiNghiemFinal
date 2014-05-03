@@ -1,0 +1,577 @@
+﻿@model QLVatTuPhongThiNghiem.Models.ViewModels.TrangTBViewModel
+@{
+    ViewData["Title"] = "Chỉnh sửa thiết bị";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>Chỉnh sửa thiết bị</h3>
+                </div>
+                <div class="col-6">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index", "Dashboard")">
+                                <i data-feather="home"></i>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index", "TrangTB")">Thiết bị</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Details", "TrangTB", new { id = Model.MaTTB })">Chi tiết</a>
+                        </li>
+                        <li class="breadcrumb-item active">Chỉnh sửa</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-xl-10 col-lg-12">
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i data-feather="alert-circle"></i>
+                        @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                <div class="card">
+                    <div class="card-header bg-warning">
+                        <h5 class="text-white mb-0">
+                            <i data-feather="edit" class="me-2"></i>Chỉnh sửa thông tin thiết bị
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="Edit" method="post" class="needs-validation" novalidate>
+                            <input asp-for="MaTTB" type="hidden" />
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                            <!-- Mã thiết bị (readonly) -->
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">Mã thiết bị</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light">
+                                            <i data-feather="hash"></i>
+                                        </span>
+                                        <input type="text" class="form-control bg-light"
+                                               value="@Model.MaTTB" readonly>
+                                    </div>
+                                    <small class="form-text text-muted">Mã thiết bị không thể thay đổi</small>
+                                </div>
+                            </div>
+
+                            <!-- Thông tin cơ bản -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="MaPhongMay" class="form-label">
+                                        Phòng máy <span class="text-danger">*</span>
+                                    </label>
+                                    <select asp-for="MaPhongMay" class="form-select" required>
+                                        <option value="">-- Chọn phòng máy --</option>
+                                        @if (ViewBag.PhongMayList != null)
+                                        {
+                                            @foreach (var item in (IEnumerable<QLVatTuPhongThiNghiem.Models.Entities.PhongMay>)ViewBag.PhongMayList)
+                                            {
+                                                <option value="@item.MaPhongMay" selected="@(item.MaPhongMay == Model.MaPhongMay)">@item.TenPhongMay</option>
+                                            }
+                                        }
+                                    </select>
+                                    <span asp-validation-for="MaPhongMay" class="text-danger"></span>
+                                    <div class="invalid-feedback">
+                                        Vui lòng chọn phòng máy.
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="MaLoai" class="form-label">
+                                        Loại thiết bị <span class="text-danger">*</span>
+                                    </label>
+                                    <select asp-for="MaLoai" class="form-select" required>
+                                        <option value="">-- Chọn loại thiết bị --</option>
+                                        @if (ViewBag.LoaiList != null)
+                                        {
+                                            @foreach (var item in (IEnumerable<QLVatTuPhongThiNghiem.Models.Entities.Loai>)ViewBag.LoaiList)
+                                            {
+                                                <option value="@item.MaLoai" selected="@(item.MaLoai == Model.MaLoai)">@item.TenLoai</option>
+                                            }
+                                        }
+                                    </select>
+                                    <span asp-validation-for="MaLoai" class="text-danger"></span>
+                                    <div class="invalid-feedback">
+                                        Vui lòng chọn loại thiết bị.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="MaThuongHieu" class="form-label">
+                                        Thương hiệu <span class="text-danger">*</span>
+                                    </label>
+                                    <select asp-for="MaThuongHieu" class="form-select" required>
+                                        <option value="">-- Chọn thương hiệu --</option>
+                                        @if (ViewBag.ThuongHieuList != null)
+                                        {
+                                            @foreach (var item in (IEnumerable<QLVatTuPhongThiNghiem.Models.Entities.ThuongHieu>)ViewBag.ThuongHieuList)
+                                            {
+                                                <option value="@item.MaThuongHieu" selected="@(item.MaThuongHieu == Model.MaThuongHieu)">@item.TenThuongHieu</option>
+                                            }
+                                        }
+                                    </select>
+                                    <span asp-validation-for="MaThuongHieu" class="text-danger"></span>
+                                    <div class="invalid-feedback">
+                                        Vui lòng chọn thương hiệu.
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="GiaTien" class="form-label">
+                                        Giá tiền (VNĐ) <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i data-feather="dollar-sign"></i>
+                                        </span>
+                                        <input asp-for="GiaTien" class="form-control" type="number" min="0" max="999999999" required />
+                                        <span class="input-group-text">VNĐ</span>
+                                    </div>
+                                    <span asp-validation-for="GiaTien" class="text-danger"></span>
+                                    <div class="invalid-feedback">
+                                        Giá tiền phải lớn hơn 0.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="TinhTrang" class="form-label">
+                                        Tình trạng <span class="text-danger">*</span>
+                                    </label>
+                                    <select asp-for="TinhTrang" class="form-select" required>
+                                        <option value="">-- Chọn tình trạng --</option>
+                                        <option value="Tốt">Tốt</option>
+                                        <option value="Khá tốt">Khá tốt</option>
+                                        <option value="Bình thường">Bình thường</option>
+                                        <option value="Cần bảo trì">Cần bảo trì</option>
+                                        <option value="Hỏng">Hỏng</option>
+                                        <option value="Đang sửa chữa">Đang sửa chữa</option>
+                                    </select>
+                                    <span asp-validation-for="TinhTrang" class="text-danger"></span>
+                                    <div class="invalid-feedback">
+                                        Vui lòng chọn tình trạng thiết bị.
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="NgayNhap" class="form-label">
+                                        Ngày nhập <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i data-feather="calendar"></i>
+                                        </span>
+                                        <input asp-for="NgayNhap" class="form-control" type="date" required />
+                                    </div>
+                                    <span asp-validation-for="NgayNhap" class="text-danger"></span>
+                                    <div class="invalid-feedback">
+                                        Vui lòng chọn ngày nhập.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Thông tin bổ sung -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Số lần sửa chữa</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light">
+                                            <i data-feather="tool"></i>
+                                        </span>
+                                        <input type="number" class="form-control bg-light" value="@Model.SoLanSua" readonly>
+                                        <span class="input-group-text">lần</span>
+                                    </div>
+                                    <small class="form-text text-muted">Số lần thiết bị đã được sửa chữa</small>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Thời gian sử dụng</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light">
+                                            <i data-feather="clock"></i>
+                                        </span>
+                                        @{
+                                            var thoiGianSuDung = DateTime.Now - Model.NgayNhap;
+                                            var soNam = (int)(thoiGianSuDung.TotalDays / 365);
+                                            var soThang = (int)((thoiGianSuDung.TotalDays % 365) / 30);
+                                        }
+                                        <input type="text" class="form-control bg-light"
+                                               value="@soNam năm @soThang tháng" readonly>
+                                    </div>
+                                    <small class="form-text text-muted">Thời gian từ khi nhập đến hiện tại</small>
+                                </div>
+                            </div>
+
+                            <!-- Lịch sử thay đổi -->
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <div class="alert alert-info">
+                                        <h6><i data-feather="info"></i> Thông tin lịch sử</h6>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <strong>Ngày nhập:</strong> @Model.NgayNhap.ToString("dd/MM/yyyy")
+                                            </div>
+                                            <div class="col-md-6">
+                                                <strong>Số lần sửa chữa:</strong> @Model.SoLanSua lần
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <!-- Warning if equipment has issues -->
+                            @if (Model.SoLanSua > 3)
+                            {
+                                <div class="alert alert-warning">
+                                    <h6><i data-feather="alert-triangle"></i> Cảnh báo</h6>
+                                    <p class="mb-0">
+                                        Thiết bị này đã được sửa chữa <strong>@Model.SoLanSua lần</strong>.
+                                        Cân nhắc thay thế hoặc nâng cấp thiết bị để đảm bảo hiệu quả sử dụng.
+                                    </p>
+                                </div>
+                            }
+
+                            @if (Model.TinhTrang == "Hỏng" || Model.TinhTrang == "Đang sửa chữa")
+                            {
+                                <div class="alert alert-danger">
+                                    <h6><i data-feather="alert-circle"></i> Thiết bị cần xử lý</h6>
+                                    <p class="mb-0">
+                                        Thiết bị hiện đang ở trạng thái <strong>@Model.TinhTrang</strong>.
+                                        Vui lòng kiểm tra và xử lý kịp thời.
+                                    </p>
+                                </div>
+                            }
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <a href="@Url.Action("Details", "TrangTB", new { id = Model.MaTTB })" class="btn btn-secondary">
+                                                <i data-feather="arrow-left"></i> Quay lại chi tiết
+                                            </a>
+                                            <a href="@Url.Action("Index", "TrangTB")" class="btn btn-outline-secondary">
+                                                <i data-feather="list"></i> Danh sách
+                                            </a>
+                                        </div>
+                                        <div>
+                                            <button type="button" class="btn btn-info me-2" id="previewBtn">
+                                                <i data-feather="eye"></i> Xem trước
+                                            </button>
+                                            <button type="reset" class="btn btn-warning me-2">
+                                                <i data-feather="refresh-cw"></i> Khôi phục
+                                            </button>
+                                            <button type="submit" class="btn btn-success">
+                                                <i data-feather="save"></i> Cập nhật
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Preview Modal -->
+                <div class="modal fade" id="previewModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header bg-info text-white">
+                                <h5 class="modal-title">
+                                    <i data-feather="eye"></i> Xem trước thông tin thiết bị
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body" id="previewContent">
+                                <!-- Content will be populated by JavaScript -->
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hướng dẫn chỉnh sửa -->
+        <div class="row justify-content-center mt-3">
+            <div class="col-xl-10 col-lg-12">
+                <div class="card border-warning">
+                    <div class="card-header bg-warning text-dark">
+                        <h6 class="mb-0">
+                            <i data-feather="alert-triangle" class="me-2"></i>Lưu ý khi chỉnh sửa
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Thay đổi cần cân nhắc:</h6>
+                                <ul class="list-unstyled text-muted">
+                                    <li>• Phòng máy: Ảnh hưởng đến quản lý vị trí</li>
+                                    <li>• Giá tiền: Tác động đến báo cáo tài chính</li>
+                                    <li>• Tình trạng: Phản ánh đúng hiện trạng</li>
+                                    <li>• Ngày nhập: Kiểm tra tính hợp lý</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Ảnh hưởng khi thay đổi:</h6>
+                                <ul class="list-unstyled text-muted">
+                                    <li>• Cập nhật báo cáo thống kê</li>
+                                    <li>• Thay đổi lịch sử thiết bị</li>
+                                    <li>• Ảnh hưởng đến kế hoạch bảo trì</li>
+                                    <li>• Cần thông báo cho người quản lý</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick actions -->
+        <div class="row justify-content-center mt-3">
+            <div class="col-xl-10 col-lg-12">
+                <div class="card border-info">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0">
+                            <i data-feather="zap" class="me-2"></i>Thao tác nhanh
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="button" class="btn btn-outline-success btn-sm" onclick="setStatus('Tốt')">
+                                <i data-feather="check-circle"></i> Đánh dấu "Tốt"
+                            </button>
+                            <button type="button" class="btn btn-outline-warning btn-sm" onclick="setStatus('Cần bảo trì')">
+                                <i data-feather="tool"></i> Cần bảo trì
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="setStatus('Hỏng')">
+                                <i data-feather="x-circle"></i> Đánh dấu "Hỏng"
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setCurrentDate()">
+                                <i data-feather="calendar"></i> Đặt ngày hôm nay
+                            </button>
+                        </div>
+                        <small class="text-muted mt-2 d-block">
+                            Nhấn vào các nút trên để nhanh chóng thay đổi thông tin
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script {
+    <script>
+        $(document).ready(function() {
+            // Initialize feather icons
+            feather.replace();
+
+            // Form validation
+            const form = document.querySelector('.needs-validation');
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            });
+
+            // Store original values for reset functionality
+            const originalValues = {
+                maPhongMay: $('#MaPhongMay').val(),
+                maLoai: $('#MaLoai').val(),
+                maThuongHieu: $('#MaThuongHieu').val(),
+                giaTien: $('#GiaTien').val(),
+                tinhTrang: $('#TinhTrang').val(),
+                ngayNhap: $('#NgayNhap').val()
+            };
+
+            // Set max date to today for NgayNhap
+            $('#NgayNhap').attr('max', new Date().toISOString().split('T')[0]);
+
+            // Preview functionality
+            $('#previewBtn').click(function() {
+                var phongMay = $('#MaPhongMay option:selected').text();
+                var loai = $('#MaLoai option:selected').text();
+                var thuongHieu = $('#MaThuongHieu option:selected').text();
+                var giaTien = $('#GiaTien').val();
+                var tinhTrang = $('#TinhTrang').val();
+                var ngayNhap = $('#NgayNhap').val();
+
+                var statusClass = '';
+                switch(tinhTrang) {
+                    case 'Tốt': statusClass = 'bg-success'; break;
+                    case 'Khá tốt': statusClass = 'bg-info'; break;
+                    case 'Bình thường': statusClass = 'bg-secondary'; break;
+                    case 'Cần bảo trì': statusClass = 'bg-warning'; break;
+                    case 'Hỏng': statusClass = 'bg-danger'; break;
+                    case 'Đang sửa chữa': statusClass = 'bg-warning'; break;
+                    default: statusClass = 'bg-secondary';
+                }
+
+                var previewHtml = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Thông tin cơ bản</h6>
+                            <dl class="row">
+                                <dt class="col-sm-5">Mã thiết bị:</dt>
+                                <dd class="col-sm-7"><code>@Model.MaTTB</code></dd>
+                                <dt class="col-sm-5">Phòng máy:</dt>
+                                <dd class="col-sm-7">${phongMay}</dd>
+                                <dt class="col-sm-5">Loại:</dt>
+                                <dd class="col-sm-7">${loai}</dd>
+                                <dt class="col-sm-5">Thương hiệu:</dt>
+                                <dd class="col-sm-7">${thuongHieu}</dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Thông tin chi tiết</h6>
+                            <dl class="row">
+                                <dt class="col-sm-5">Giá tiền:</dt>
+                                <dd class="col-sm-7"><strong>${Number(giaTien).toLocaleString('vi-VN')} VNĐ</strong></dd>
+                                <dt class="col-sm-5">Tình trạng:</dt>
+                                <dd class="col-sm-7"><span class="badge ${statusClass}">${tinhTrang}</span></dd>
+                                <dt class="col-sm-5">Ngày nhập:</dt>
+                                <dd class="col-sm-7">${new Date(ngayNhap).toLocaleDateString('vi-VN')}</dd>
+                                <dt class="col-sm-5">Số lần sửa:</dt>
+                                <dd class="col-sm-7">@Model.SoLanSua lần</dd>
+                            </dl>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="alert alert-info mb-0">
+                        <h6><i data-feather="info"></i> Tóm tắt thay đổi</h6>
+                        <p class="mb-0">Thiết bị <strong>@Model.MaTTB</strong> sẽ được cập nhật với thông tin mới.
+                        Vui lòng kiểm tra kỹ trước khi lưu.</p>
+                    </div>
+                `;
+
+                $('#previewContent').html(previewHtml);
+                feather.replace(); // Re-initialize feather icons in modal
+                $('#previewModal').modal('show');
+            });
+
+            // Custom reset functionality
+            $('button[type="reset"]').click(function(e) {
+                e.preventDefault();
+
+                Swal.fire({
+                    title: 'Khôi phục dữ liệu?',
+                    text: 'Bạn có muốn khôi phục về dữ liệu ban đầu không?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Khôi phục',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Restore original values
+                        $('#MaPhongMay').val(originalValues.maPhongMay);
+                        $('#MaLoai').val(originalValues.maLoai);
+                        $('#MaThuongHieu').val(originalValues.maThuongHieu);
+                        $('#GiaTien').val(originalValues.giaTien);
+                        $('#TinhTrang').val(originalValues.tinhTrang);
+                        $('#NgayNhap').val(originalValues.ngayNhap);
+
+                        // Remove validation classes
+                        form.classList.remove('was-validated');
+
+                        Swal.fire('Thành công!', 'Đã khôi phục dữ liệu ban đầu', 'success');
+                    }
+                });
+            });
+
+            // Real-time validation
+            $('select, input').on('blur change', function() {
+                if ($(this).attr('required')) {
+                    if ($(this).val()) {
+                        $(this).removeClass('is-invalid').addClass('is-valid');
+                    } else {
+                        $(this).removeClass('is-valid').addClass('is-invalid');
+                    }
+                }
+            });
+
+            // Warn when changing critical fields
+            $('#GiaTien, #TinhTrang').on('change', function() {
+                var fieldName = $(this).attr('id') === 'GiaTien' ? 'giá tiền' : 'tình trạng';
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Thông báo',
+                    text: `Thay đổi ${fieldName} sẽ ảnh hưởng đến báo cáo và thống kê!`,
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            });
+
+            // Confirm before leaving if form is dirty
+            var formChanged = false;
+            $('select, input').on('change', function() {
+                formChanged = true;
+            });
+
+            $(window).on('beforeunload', function() {
+                if (formChanged) {
+                    return 'Bạn có thay đổi chưa được lưu. Bạn có chắc chắn muốn rời khỏi trang?';
+                }
+            });
+
+            $('form').on('submit', function() {
+                formChanged = false;
+            });
+        });
+
+        // Quick action functions
+        function setStatus(status) {
+            $('#TinhTrang').val(status);
+            $('#TinhTrang').trigger('change');
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Đã cập nhật!',
+                text: `Tình trạng được đặt thành "${status}"`,
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+
+        function setCurrentDate() {
+            var today = new Date().toISOString().split('T')[0];
+            $('#NgayNhap').val(today);
+            $('#NgayNhap').trigger('change');
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Đã cập nhật!',
+                text: 'Ngày nhập được đặt thành hôm nay',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+    </script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

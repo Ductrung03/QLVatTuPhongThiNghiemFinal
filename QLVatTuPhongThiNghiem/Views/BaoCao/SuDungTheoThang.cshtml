@@ -1,0 +1,188 @@
+﻿@model IEnumerable<QLVatTuPhongThiNghiem.Models.ViewModels.ThongKeSuDungTheoThangViewModel>
+@{
+    ViewData["Title"] = "Thống kê sử dụng theo tháng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var nam = ViewBag.Nam ?? DateTime.Now.Year;
+}
+
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>Thống kê sử dụng theo tháng</h3>
+                </div>
+                <div class="col-6">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Dashboard")"><i data-feather="home"></i></a></li>
+                        <li class="breadcrumb-item">Báo cáo</li>
+                        <li class="breadcrumb-item active">Sử dụng theo tháng</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Thống kê sử dụng phòng thí nghiệm năm @nam</h5>
+                        <div class="card-header-right">
+                            <form method="get" class="d-inline">
+                                <select name="nam" class="form-control d-inline" style="width: auto;" onchange="this.form.submit()">
+                                    @for (int i = DateTime.Now.Year; i >= DateTime.Now.Year - 5; i--)
+                                    {
+                                        <option value="@i" selected="@(i == nam)">@i</option>
+                                    }
+                                </select>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <canvas id="usageChart" width="400" height="150"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Tháng</th>
+                                                <th>Số lịch</th>
+                                                <th>Tổng giờ</th>
+                                                <th>TB giờ/lịch</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (Model?.Any() == true)
+                                            {
+                                                @foreach (var item in Model)
+                                                {
+                                                    <tr>
+                                                        <td><strong>Tháng @item.Thang</strong></td>
+                                                        <td><span class="badge badge-primary">@item.SoLichThucHanh</span></td>
+                                                        <td><span class="badge badge-success">@item.TongGioSuDung</span></td>
+                                                        <td>
+                                                            @(item.SoLichThucHanh > 0 ? String.Format("{0:N1}", (double)item.TongGioSuDung / item.SoLichThucHanh) : "0")
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td colspan="4" class="text-center">Không có dữ liệu</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Tổng kết năm @nam</h6>
+                                        @{
+                                            var tongLich = Model?.Sum(x => x.SoLichThucHanh) ?? 0;
+                                            var tongGio = Model?.Sum(x => x.TongGioSuDung) ?? 0;
+                                            var thangCoNhieuLichNhat = Model?.OrderByDescending(x => x.SoLichThucHanh).FirstOrDefault();
+                                        }
+                                        <ul class="list-unstyled">
+                                            <li><strong>Tổng số lịch:</strong> @tongLich lịch</li>
+                                            <li><strong>Tổng số giờ:</strong> @tongGio giờ</li>
+                                            <li><strong>Trung bình/tháng:</strong> @String.Format("{0:N1}", (double)tongLich / 12) lịch</li>
+                                            @if (thangCoNhieuLichNhat != null)
+                                            {
+                                                <li><strong>Tháng cao nhất:</strong> Tháng @thangCoNhieuLichNhat.Thang (@thangCoNhieuLichNhat.SoLichThucHanh lịch)</li>
+                                            }
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script>
+    $(document).ready(function() {
+        feather.replace();
+        
+        // Create usage chart
+        var ctx = document.getElementById('usageChart').getContext('2d');
+        var chartData = {
+            labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 
+                     'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+            datasets: [
+                {
+                    label: 'Số lịch thực hành',
+                    data: [@Html.Raw(string.Join(",", Enumerable.Range(1, 12).Select(m => 
+                        Model?.FirstOrDefault(x => x.Thang == m)?.SoLichThucHanh.ToString() ?? "0")))],
+                    backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 2,
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Tổng giờ sử dụng',
+                    data: [@Html.Raw(string.Join(",", Enumerable.Range(1, 12).Select(m => 
+                        Model?.FirstOrDefault(x => x.Thang == m)?.TongGioSuDung.ToString() ?? "0")))],
+                    backgroundColor: 'rgba(255, 99, 132, 0.8)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2,
+                    yAxisID: 'y1'
+                }
+            ]
+        };
+        
+        var usageChart = new Chart(ctx, {
+            type: 'line',
+            data: chartData,
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Số lịch'
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Giờ sử dụng'
+                        },
+                        grid: {
+                            drawOnChartArea: false,
+                        },
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Biểu đồ sử dụng phòng thí nghiệm năm @nam'
+                    }
+                }
+            }
+        });
+    });
+</script>

@@ -1,0 +1,228 @@
+﻿@model IEnumerable<QLVatTuPhongThiNghiem.Models.Entities.Loai>
+@{
+    ViewData["Title"] = "Quản lý loại thiết bị";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>Quản lý loại thiết bị</h3>
+                </div>
+                <div class="col-6">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Dashboard")"><i data-feather="home"></i></a></li>
+                        <li class="breadcrumb-item">Dữ liệu danh mục</li>
+                        <li class="breadcrumb-item active">Loại thiết bị</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Danh sách loại thiết bị</h5>
+                        <div class="card-header-right">
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
+                                <i data-feather="plus"></i> Thêm loại mới
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Mã loại</th>
+                                        <th>Tên loại</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model?.Any() == true)
+                                    {
+                                        @foreach (var item in Model)
+                                        {
+                                            <tr>
+                                                <td>@item.MaLoai</td>
+                                                <td>@item.TenLoai</td>
+                                                <td>
+                                                    <button type="button" class="btn btn-primary btn-xs"
+                                                            onclick="editItem(@item.MaLoai, '@item.TenLoai')" title="Sửa">
+                                                        <i data-feather="edit"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-xs"
+                                                            onclick="deleteItem(@item.MaLoai)" title="Xóa">
+                                                        <i data-feather="trash-2"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="3" class="text-center">Chưa có dữ liệu</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Modal -->
+<div class="modal fade" id="createModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thêm loại thiết bị mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createForm">
+                    <div class="form-group">
+                        <label>Mã loại</label>
+                        <input type="number" id="createMaLoai" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Tên loại</label>
+                        <input type="text" id="createTenLoai" class="form-control" required />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="createItem()">Thêm</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Sửa loại thiết bị</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <input type="hidden" id="editMaLoai" />
+                    <div class="form-group">
+                        <label>Mã loại</label>
+                        <input type="number" id="editMaLoaiDisplay" class="form-control" readonly />
+                    </div>
+                    <div class="form-group">
+                        <label>Tên loại</label>
+                        <input type="text" id="editTenLoai" class="form-control" required />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="updateItem()">Cập nhật</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function createItem() {
+        var maLoai = $('#createMaLoai').val();
+        var tenLoai = $('#createTenLoai').val();
+
+        if (!maLoai || !tenLoai) {
+            alert('Vui lòng nhập đầy đủ thông tin');
+            return;
+        }
+
+        $.ajax({
+            url: '@Url.Action("CreateLoai", "MasterData")',
+            type: 'POST',
+            data: { MaLoai: maLoai, TenLoai: tenLoai },
+            success: function(result) {
+                if (result.success) {
+                    alert(result.message);
+                    location.reload();
+                } else {
+                    alert(result.message);
+                }
+            },
+            error: function() {
+                alert('Có lỗi xảy ra khi thêm loại thiết bị');
+            }
+        });
+    }
+
+    function editItem(maLoai, tenLoai) {
+        $('#editMaLoai').val(maLoai);
+        $('#editMaLoaiDisplay').val(maLoai);
+        $('#editTenLoai').val(tenLoai);
+        $('#editModal').modal('show');
+    }
+
+    function updateItem() {
+        var maLoai = $('#editMaLoai').val();
+        var tenLoai = $('#editTenLoai').val();
+
+        if (!tenLoai) {
+            alert('Vui lòng nhập tên loại');
+            return;
+        }
+
+        $.ajax({
+            url: '@Url.Action("UpdateLoai", "MasterData")',
+            type: 'POST',
+            data: { MaLoai: maLoai, TenLoai: tenLoai },
+            success: function(result) {
+                if (result.success) {
+                    alert(result.message);
+                    location.reload();
+                } else {
+                    alert(result.message);
+                }
+            },
+            error: function() {
+                alert('Có lỗi xảy ra khi cập nhật loại thiết bị');
+            }
+        });
+    }
+
+    function deleteItem(maLoai) {
+        if (confirm('Bạn có chắc chắn muốn xóa loại thiết bị này?')) {
+            $.ajax({
+                url: '@Url.Action("DeleteLoai", "MasterData")',
+                type: 'POST',
+                data: { id: maLoai },
+                success: function(result) {
+                    if (result.success) {
+                        alert(result.message);
+                        location.reload();
+                    } else {
+                        alert(result.message);
+                    }
+                },
+                error: function() {
+                    alert('Có lỗi xảy ra khi xóa loại thiết bị');
+                }
+            });
+        }
+    }
+
+    $(document).ready(function() {
+        feather.replace();
+    });
+</script>
+

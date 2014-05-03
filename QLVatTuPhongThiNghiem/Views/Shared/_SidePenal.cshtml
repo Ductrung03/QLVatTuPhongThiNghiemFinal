@@ -1,0 +1,145 @@
+﻿<div class="sidebar-wrapper" sidebar-layout="stroke-svg">
+    <div>
+        <div class="logo-wrapper">
+            <a asp-controller="Dashboard" asp-action="Index">
+                <img class="img-fluid for-light" src="~/assets/images/logo/logo.png" alt="">
+                <img class="img-fluid for-dark" src="~/assets/images/logo/logo_dark.png" alt="">
+            </a>
+            <div class="back-btn"><i class="fa fa-angle-left"></i></div>
+            <div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="grid"> </i></div>
+        </div>
+        <div class="logo-icon-wrapper">
+            <a asp-controller="Dashboard" asp-action="Index">
+                <img class="img-fluid" src="~/assets/images/logo/logo-icon.png" alt="">
+            </a>
+        </div>
+        <nav class="sidebar-main">
+            <div class="left-arrow" id="left-arrow"><i data-feather="arrow-left"></i></div>
+            <div id="sidebar-menu">
+                <ul class="sidebar-links" id="simple-bar">
+                    <li class="sidebar-main-title">
+                        <div>
+                            <h6 class="lan-8">QUẢN LÝ VẬT TƯ PHÒNG THÍ NGHIỆM</h6>
+                        </div>
+                    </li>
+
+                    <!-- Dashboard -->
+                    <li class="sidebar-list">
+                        <a class="sidebar-link sidebar-title" asp-controller="Dashboard" asp-action="Index">
+                            <svg class="stroke-icon">
+                                <use href="~/assets/svg/icon-sprite.svg#stroke-home"></use>
+                            </svg>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+
+                    <!-- Quản lý thiết bị -->
+                    <li class="sidebar-list">
+                        <a class="sidebar-link sidebar-title">
+                            <svg class="stroke-icon">
+                                <use href="~/assets/svg/icon-sprite.svg#stroke-box"></use>
+                            </svg>
+                            <span>Quản lý thiết bị</span>
+                        </a>
+                        <ul class="sidebar-submenu">
+                            <li><a asp-controller="TrangTB" asp-action="Index">Danh sách thiết bị</a></li>
+                            <li><a asp-controller="TrangTB" asp-action="Create">Thêm thiết bị</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Lịch thực hành -->
+                    <li class="sidebar-list">
+                        <a class="sidebar-link sidebar-title">
+                            <svg class="stroke-icon">
+                                <use href="~/assets/svg/icon-sprite.svg#stroke-calendar"></use>
+                            </svg>
+                            <span>Lịch thực hành</span>
+                        </a>
+                        <ul class="sidebar-submenu">
+                            <li><a asp-controller="LichThucHanh" asp-action="Index">Tất cả lịch</a></li>
+                            <li><a asp-controller="LichThucHanh" asp-action="Create">Đăng ký lịch</a></li>
+                            <li><a asp-controller="LichThucHanh" asp-action="MySchedule">Lịch của tôi</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Sửa chữa bảo hành -->
+                    <li class="sidebar-list">
+                        <a class="sidebar-link sidebar-title">
+                            <svg class="stroke-icon">
+                                <use href="~/assets/svg/icon-sprite.svg#stroke-tool"></use>
+                            </svg>
+                            <span>Sửa chữa bảo hành</span>
+                        </a>
+                        <ul class="sidebar-submenu">
+                            <li><a asp-controller="SuaChua" asp-action="Index">Danh sách</a></li>
+                            <li><a asp-controller="SuaChua" asp-action="Create">Tạo phiếu sửa chữa</a></li>
+                            <li><a asp-controller="SuaChua" asp-action="InProgress">Đang sửa chữa</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Xuất nhập tồn -->
+                    <li class="sidebar-list">
+                        <a class="sidebar-link sidebar-title">
+                            <svg class="stroke-icon">
+                                <use href="~/assets/svg/icon-sprite.svg#stroke-archive"></use>
+                            </svg>
+                            <span>Xuất nhập tồn</span>
+                        </a>
+                        <ul class="sidebar-submenu">
+                            <li><a asp-controller="XuatNhapTon" asp-action="Index">Danh sách phiếu</a></li>
+                            <li><a asp-controller="XuatNhapTon" asp-action="Nhap">Nhập thiết bị</a></li>
+                            <li><a asp-controller="XuatNhapTon" asp-action="Xuat">Xuất thiết bị</a></li>
+                            <li><a asp-controller="XuatNhapTon" asp-action="BaoCaoTonKho">Báo cáo tồn kho</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Đánh giá cấp độ -->
+                    <li class="sidebar-list">
+                        <a class="sidebar-link sidebar-title">
+                            <svg class="stroke-icon">
+                                <use href="~/assets/svg/icon-sprite.svg#stroke-star"></use>
+                            </svg>
+                            <span>Đánh giá cấp độ</span>
+                        </a>
+                        <ul class="sidebar-submenu">
+                            <li><a asp-controller="DanhGiaCapDo" asp-action="Index">Danh sách đánh giá</a></li>
+                            <li><a asp-controller="DanhGiaCapDo" asp-action="Create">Thêm đánh giá</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Dữ liệu danh mục -->
+                    <li class="sidebar-list">
+                        <a class="sidebar-link sidebar-title">
+                            <svg class="stroke-icon">
+                                <use href="~/assets/svg/icon-sprite.svg#stroke-settings"></use>
+                            </svg>
+                            <span>Dữ liệu danh mục</span>
+                        </a>
+                        <ul class="sidebar-submenu">
+                            <li><a asp-controller="MasterData" asp-action="Loai">Loại thiết bị</a></li>
+                            <li><a asp-controller="MasterData" asp-action="ThuongHieu">Thương hiệu</a></li>
+                            <li><a asp-controller="MasterData" asp-action="PhongMay">Phòng máy</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Báo cáo thống kê -->
+                    <li class="sidebar-list">
+                        <a class="sidebar-link sidebar-title">
+                            <svg class="stroke-icon">
+                                <use href="~/assets/svg/icon-sprite.svg#stroke-bar-chart"></use>
+                            </svg>
+                            <span>Báo cáo thống kê</span>
+                        </a>
+                        <ul class="sidebar-submenu">
+                            <li><a asp-controller="BaoCao" asp-action="ThongKeTheoPhong">Thống kê theo phòng</a></li>
+                            <li><a asp-controller="BaoCao" asp-action="SuDungTheoThang">Sử dụng theo tháng</a></li>
+                            <li><a asp-controller="BaoCao" asp-action="ChiPhiSuaChua">Chi phí sửa chữa</a></li>
+                            <li><a asp-controller="BaoCao" asp-action="DanhGiaCapDo">Đánh giá cấp độ</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>
+        </nav>
+    </div>
+</div>

@@ -1,0 +1,454 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <partial name="_Style" />
+    <style>
+        /* Custom styles for teacher management system */
+        .avatar-sm {
+            height: 2rem;
+            width: 2rem;
+        }
+
+        .avatar-title {
+            align-items: center;
+            background-color: #6c757d;
+            color: #fff;
+            display: flex;
+            font-size: 1rem;
+            font-weight: 600;
+            height: 100%;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .activity-timeline {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .activity-dot-primary, .activity-dot-secondary, .activity-dot-success, .activity-dot-warning {
+            position: absolute;
+            left: 0;
+            top: 0.25rem;
+            height: 0.75rem;
+            width: 0.75rem;
+            border-radius: 50%;
+        }
+
+        .activity-dot-primary {
+            background-color: #007bff;
+        }
+
+        .activity-dot-secondary {
+            background-color: #6c757d;
+        }
+
+        .activity-dot-success {
+            background-color: #28a745;
+        }
+
+        .activity-dot-warning {
+            background-color: #ffc107;
+        }
+
+        .error-page {
+            padding: 2rem;
+        }
+
+        .error-number h1 {
+            font-size: 6rem;
+            font-weight: bold;
+            color: #dc3545;
+            margin-bottom: 1rem;
+        }
+
+        .error-description h5 {
+            margin-bottom: 1rem;
+        }
+
+        .error-actions {
+            margin-top: 2rem;
+        }
+
+        /* Styles for teaching management */
+        .teaching-stats .card {
+            transition: transform 0.2s;
+        }
+
+            .teaching-stats .card:hover {
+                transform: translateY(-2px);
+            }
+
+        .badge-outline {
+            background-color: transparent;
+            border: 1px solid;
+        }
+
+        .table-teaching td, .table-teaching th {
+            vertical-align: middle;
+            padding: 0.75rem 0.5rem;
+        }
+
+        .btn-group-teaching .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        /* Sidebar submenu titles */
+        .sidebar-submenu-title {
+            color: #6c757d;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.5rem;
+            margin-bottom: 0.25rem;
+            padding-left: 1rem;
+        }
+
+        .sidebar-submenu .sidebar-submenu-title:first-child {
+            margin-top: 0;
+        }
+
+        /* Filter cards */
+        .filter-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+            .filter-card .form-label {
+                color: rgba(255, 255, 255, 0.9);
+                font-weight: 500;
+            }
+
+            .filter-card .form-select,
+            .filter-card .form-control {
+                background-color: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                color: white;
+            }
+
+                .filter-card .form-select:focus,
+                .filter-card .form-control:focus {
+                    background-color: rgba(255, 255, 255, 0.15);
+                    border-color: rgba(255, 255, 255, 0.4);
+                    box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
+                    color: white;
+                }
+
+                .filter-card .form-select option {
+                    background-color: #fff;
+                    color: #333;
+                }
+
+        /* Statistics cards animations */
+        .stats-card {
+            transition: all 0.3s ease;
+        }
+
+            .stats-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            }
+
+        /* Loading states */
+        .btn .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        /* Form enhancements */
+        .form-floating > label {
+            padding: 1rem 0.75rem;
+        }
+
+        .form-floating > .form-control,
+        .form-floating > .form-select {
+            padding: 1rem 0.75rem;
+        }
+
+        /* Table enhancements */
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 123, 255, 0.075);
+        }
+
+        .table thead th {
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+        }
+
+        /* Print styles */
+        @@media print {
+            .btn, .card-header .btn-group, .card-footer,
+            .page-title, .breadcrumb, .sidebar-wrapper,
+            .header-wrapper, .footer {
+                display: none !important;
+            }
+
+            .card {
+                border: none !important;
+                box-shadow: none !important;
+            }
+
+            .table {
+                font-size: 12px;
+            }
+
+            .badge {
+                background-color: #f8f9fa !important;
+                color: #212529 !important;
+                border: 1px solid #dee2e6 !important;
+            }
+
+            .page-body {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .container-fluid {
+                padding: 0 !important;
+            }
+        }
+
+        /* Responsive enhancements */
+        @@media (max-width: 768px) {
+            .btn-group-teaching {
+                flex-direction: column;
+            }
+
+                .btn-group-teaching .btn {
+                    margin-bottom: 0.25rem;
+                }
+
+            .table-responsive {
+                font-size: 0.875rem;
+            }
+
+            .stats-card h4 {
+                font-size: 1.5rem;
+            }
+
+            .filter-card .row > .col-md-3,
+            .filter-card .row > .col-md-2,
+            .filter-card .row > .col-md-4 {
+                margin-bottom: 1rem;
+            }
+        }
+
+        /* Custom scrollbar */
+        .table-responsive::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-responsive::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+
+            .table-responsive::-webkit-scrollbar-thumb:hover {
+                background: #a1a1a1;
+            }
+
+        /* Form validation enhancements */
+        .was-validated .form-control:valid,
+        .form-control.is-valid {
+            border-color: #28a745;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='m2.3 6.73.5-.5L4.2 7.6z'/%3e%3c/svg%3e");
+        }
+
+        .was-validated .form-control:invalid,
+        .form-control.is-invalid {
+            border-color: #dc3545;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.8 3.6.6.6L5.8 8.4'/%3e%3c/svg%3e");
+        }
+
+        /* Tooltip enhancements */
+        .tooltip {
+            font-size: 0.875rem;
+        }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-spinner {
+            width: 3rem;
+            height: 3rem;
+            border: 0.3rem solid #f3f3f3;
+            border-top: 0.3rem solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @@keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <partial name="_Loader" />
+    <div class="tap-top"><i data-feather="chevrons-up"></i></div>
+    <div class="page-wrapper compact-wrapper" id="pageWrapper">
+        <partial name="_Header" />
+        <div class="page-body-wrapper sidebar-icon">
+            <partial name="_SidePenal" />
+            @RenderBody()
+            <partial name="_Footer" />
+        </div>
+    </div>
+
+    <!-- Loading overlay for AJAX calls -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <partial name="_Script" />
+
+    <!-- Global JavaScript functions for teaching management -->
+    <script>
+        // Global loading functions
+        function showLoading() {
+            $('#loadingOverlay').show();
+        }
+
+        function hideLoading() {
+            $('#loadingOverlay').hide();
+        }
+
+        // Global AJAX setup
+        $(document).ajaxStart(function() {
+            showLoading();
+        }).ajaxStop(function() {
+            hideLoading();
+        });
+
+        // Global form validation
+        $(document).ready(function() {
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Auto-hide alerts after 5 seconds
+            $('.alert:not(.alert-permanent)').delay(5000).fadeOut('slow');
+
+            // Confirm delete actions
+            $('button[data-action="delete"], a[data-action="delete"]').click(function(e) {
+                if (!confirm('Bạn có chắc chắn muốn xóa mục này?')) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+
+            // Auto-format number inputs
+            $('input[type="number"]').on('input', function() {
+                var value = $(this).val();
+                if (value && !isNaN(value)) {
+                    $(this).removeClass('is-invalid').addClass('is-valid');
+                } else if (value) {
+                    $(this).removeClass('is-valid').addClass('is-invalid');
+                }
+            });
+
+            // Table row selection
+            $('.table input[type="checkbox"].row-checkbox').change(function() {
+                var checkedCount = $('.table input[type="checkbox"].row-checkbox:checked').length;
+                $('.bulk-action-count').text(checkedCount);
+
+                if (checkedCount > 0) {
+                    $('.bulk-actions').show();
+                } else {
+                    $('.bulk-actions').hide();
+                }
+            });
+
+            // Select all functionality
+            $('.table input[type="checkbox"].select-all').change(function() {
+                var isChecked = $(this).is(':checked');
+                $(this).closest('table').find('input[type="checkbox"].row-checkbox').prop('checked', isChecked).trigger('change');
+            });
+        });
+
+        // Global utility functions
+        function formatNumber(num) {
+            return new Intl.NumberFormat('vi-VN').format(num);
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(amount);
+        }
+
+        function formatDate(dateString) {
+            return new Intl.DateTimeFormat('vi-VN').format(new Date(dateString));
+        }
+
+        // Export functions
+        function exportTableToExcel(tableId, filename) {
+            if (typeof XLSX === 'undefined') {
+                alert('Thư viện XLSX chưa được tải. Vui lòng tải lại trang.');
+                return;
+            }
+
+            var table = document.getElementById(tableId);
+            if (!table) {
+                alert('Không tìm thấy bảng dữ liệu.');
+                return;
+            }
+
+            var wb = XLSX.utils.table_to_book(table, {sheet: "Data"});
+            XLSX.writeFile(wb, filename + '.xlsx');
+        }
+
+        // Print function
+        function printPage() {
+            window.print();
+        }
+
+        // Notification function
+        function showNotification(message, type = 'info') {
+            var alertClass = 'alert-' + type;
+            var alertHtml = '<div class="alert ' + alertClass + ' alert-dismissible fade show" role="alert">' +
+                '<strong>' + message + '</strong>' +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+                '</div>';
+
+            $('#notifications-container').append(alertHtml);
+
+            // Auto-hide after 5 seconds
+            setTimeout(function() {
+                $('.alert:last-child').fadeOut('slow', function() {
+                    $(this).remove();
+                });
+            }, 5000);
+        }
+    </script>
+
+    @await RenderSectionAsync("Script", required: false)
+</body>
+</html>

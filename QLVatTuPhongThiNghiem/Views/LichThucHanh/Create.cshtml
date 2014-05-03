@@ -1,0 +1,521 @@
+﻿@model QLVatTuPhongThiNghiem.Models.ViewModels.LichThucHanhViewModel
+@{
+    ViewData["Title"] = "Đăng ký lịch thực hành";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>Đăng ký lịch thực hành</h3>
+                </div>
+                <div class="col-6">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index", "Dashboard")">
+                                <i data-feather="home"></i>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index", "LichThucHanh")">Lịch thực hành</a>
+                        </li>
+                        <li class="breadcrumb-item active">Đăng ký</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-xl-10 col-lg-12">
+                <!-- Alert Messages -->
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i data-feather="check-circle"></i>
+                        @TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i data-feather="alert-circle"></i>
+                        @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                <!-- Main Form -->
+                <div class="card">
+                    <div class="card-header bg-success">
+                        <h5 class="text-white mb-0">
+                            <i data-feather="calendar-plus" class="me-2"></i>Thông tin lịch thực hành
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="Create" method="post" class="needs-validation" novalidate>
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                            <!-- Thông tin người đăng ký -->
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <div class="alert alert-info">
+                                        <h6><i data-feather="user"></i> Thông tin người đăng ký</h6>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <strong>Họ tên:</strong> @ViewBag.CurrentUser?.HoTen
+                                            </div>
+                                            <div class="col-md-6">
+                                                <strong>Email:</strong> @ViewBag.CurrentUser?.Email
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Chọn phòng máy -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        Phòng máy thực hành <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select" name="MaPhongMay" id="phongMaySelect" required>
+                                        <option value="">-- Chọn phòng máy --</option>
+                                        @if (ViewBag.PhongMayList != null)
+                                        {
+                                            @foreach (var item in (IEnumerable<QLVatTuPhongThiNghiem.Models.Entities.PhongMay>)ViewBag.PhongMayList)
+                                            {
+                                                <option value="@item.MaPhongMay">
+                                                    @item.TenPhongMay
+                                                </option>
+                                            }
+                                        }
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Vui lòng chọn phòng máy.
+                                    </div>
+                                    <small class="form-text text-muted">Chọn phòng máy phù hợp với mục đích thực hành</small>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        Số lượng người tham gia <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i data-feather="users"></i>
+                                        </span>
+                                        <input type="number" class="form-control" name="SoNguoiThamGia"
+                                               id="soNguoiThamGia" min="1" max="50" required placeholder="Nhập số người">
+                                        <span class="input-group-text">người</span>
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Số người phải từ 1 đến 50.
+                                    </div>
+                                    <div id="capacityWarning" class="text-warning" style="display: none;">
+                                        <small><i data-feather="alert-triangle" style="width: 12px; height: 12px;"></i> Vượt quá sức chứa phòng!</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Thời gian -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="ThoiGianBD" class="form-label">
+                                        Thời gian bắt đầu <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i data-feather="play-circle"></i>
+                                        </span>
+                                        <input asp-for="ThoiGianBD" class="form-control" type="datetime-local" required />
+                                    </div>
+                                    <span asp-validation-for="ThoiGianBD" class="text-danger"></span>
+                                    <div class="invalid-feedback">
+                                        Vui lòng chọn thời gian bắt đầu.
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="ThoiGianKT" class="form-label">
+                                        Thời gian kết thúc <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i data-feather="stop-circle"></i>
+                                        </span>
+                                        <input asp-for="ThoiGianKT" class="form-control" type="datetime-local" required />
+                                    </div>
+                                    <span asp-validation-for="ThoiGianKT" class="text-danger"></span>
+                                    <div class="invalid-feedback">
+                                        Vui lòng chọn thời gian kết thúc.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Thông tin bổ sung -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Mục đích thực hành</label>
+                                    <select class="form-select" name="MucDich" id="mucDichSelect">
+                                        <option value="">-- Chọn mục đích --</option>
+                                        <option value="Học tập">Học tập</option>
+                                        <option value="Nghiên cứu">Nghiên cứu</option>
+                                        <option value="Thí nghiệm">Thí nghiệm</option>
+                                        <option value="Đào tạo">Đào tạo</option>
+                                        <option value="Khác">Khác</option>
+                                    </select>
+                                    <small class="form-text text-muted">Mục đích chính của buổi thực hành</small>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Môn học/Dự án</label>
+                                    <input type="text" class="form-control" name="MonHoc"
+                                           placeholder="VD: Lập trình Java, Mạng máy tính...">
+                                    <small class="form-text text-muted">Tên môn học hoặc dự án liên quan</small>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <label class="form-label">Ghi chú thêm</label>
+                                    <textarea class="form-control" name="GhiChu" rows="3"
+                                              placeholder="Mô tả chi tiết về nội dung thực hành, yêu cầu đặc biệt..."></textarea>
+                                    <small class="form-text text-muted">
+                                        Thông tin bổ sung về buổi thực hành (thiết bị cần thiết, yêu cầu đặc biệt...)
+                                    </small>
+                                </div>
+                            </div>
+
+                            <!-- Kiểm tra xung đột lịch -->
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="checkConflict" checked>
+                                        <label class="form-check-label" for="checkConflict">
+                                            Kiểm tra trùng lịch tự động
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Xem trước thông tin -->
+                            <div class="row" id="previewSection" style="display: none;">
+                                <div class="col-12 mb-3">
+                                    <div class="alert alert-success">
+                                        <h6><i data-feather="calendar"></i> Xem trước lịch đăng ký</h6>
+                                        <div id="previewContent">
+                                            <!-- Content will be populated by JavaScript -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Lưu ý quan trọng -->
+                            <div class="alert alert-info">
+                                <h6><i data-feather="info"></i> Lưu ý quan trọng:</h6>
+                                <ul class="mb-0">
+                                    <li>Thời gian thực hành tối thiểu là <strong>1 giờ</strong></li>
+                                    <li>Thời gian bắt đầu phải <strong>sau thời điểm hiện tại ít nhất 30 phút</strong></li>
+                                    <li>Không được trùng với lịch đã đăng ký trước đó</li>
+                                    <li>Có thể hủy lịch trước thời gian bắt đầu <strong>2 giờ</strong></li>
+                                    <li>Vui lòng đến đúng giờ và thông báo nếu có thay đổi</li>
+                                </ul>
+                            </div>
+
+                            <!-- Action buttons -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <hr>
+                                    <div class="d-flex justify-content-between">
+                                        <a asp-action="Index" class="btn btn-secondary">
+                                            <i data-feather="arrow-left"></i> Quay lại
+                                        </a>
+                                        <div>
+                                            <button type="button" class="btn btn-info me-2" id="previewBtn">
+                                                <i data-feather="eye"></i> Xem trước
+                                            </button>
+                                            <button type="reset" class="btn btn-warning me-2">
+                                                <i data-feather="refresh-cw"></i> Làm mới
+                                            </button>
+                                            <button type="submit" class="btn btn-success">
+                                                <i data-feather="calendar-plus"></i> Đăng ký lịch
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mẫu lịch nhanh -->
+        <div class="row justify-content-center mt-3">
+            <div class="col-xl-10 col-lg-12">
+                <div class="card border-info">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0">
+                            <i data-feather="zap" class="me-2"></i>Tạo lịch nhanh
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3 mb-2">
+                                <button type="button" class="btn btn-outline-primary btn-sm w-100 quick-schedule"
+                                        data-hours="2" data-purpose="Học tập">
+                                    <i data-feather="book"></i> Học tập (2 giờ)
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <button type="button" class="btn btn-outline-success btn-sm w-100 quick-schedule"
+                                        data-hours="3" data-purpose="Thí nghiệm">
+                                    <i data-feather="activity"></i> Thí nghiệm (3 giờ)
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <button type="button" class="btn btn-outline-warning btn-sm w-100 quick-schedule"
+                                        data-hours="4" data-purpose="Nghiên cứu">
+                                    <i data-feather="search"></i> Nghiên cứu (4 giờ)
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <button type="button" class="btn btn-outline-info btn-sm w-100 quick-schedule"
+                                        data-hours="1" data-purpose="Đào tạo">
+                                    <i data-feather="users"></i> Đào tạo (1 giờ)
+                                </button>
+                            </div>
+                        </div>
+                        <small class="text-muted">
+                            Nhấn vào các nút trên để tự động đặt thời gian và mục đích
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lịch đã đăng ký gần đây -->
+        <div class="row justify-content-center mt-3">
+            <div class="col-xl-10 col-lg-12">
+                <div class="card border-secondary">
+                    <div class="card-header bg-secondary text-white">
+                        <h6 class="mb-0">
+                            <i data-feather="clock" class="me-2"></i>Lịch đã đăng ký gần đây
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">Hiển thị 5 lịch thực hành gần nhất của bạn để tham khảo:</p>
+                        <div id="recentSchedules">
+                            <!-- Sẽ được load bằng AJAX -->
+                            <div class="text-center text-muted">
+                                <i data-feather="loader" class="spinning"></i> Đang tải...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script {
+    <script>
+        $(document).ready(function() {
+            // Initialize feather icons
+            feather.replace();
+
+            // Form validation
+            const form = document.querySelector('.needs-validation');
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            });
+
+            // Set minimum datetime to current time + 30 minutes
+            var now = new Date();
+            now.setMinutes(now.getMinutes() + 30);
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            var minDateTime = now.toISOString().slice(0, 16);
+
+            $('#ThoiGianBD').attr('min', minDateTime);
+            $('#ThoiGianKT').attr('min', minDateTime);
+
+            // Auto set end time when start time changes
+            $('#ThoiGianBD').change(function() {
+                var startTime = new Date(this.value);
+                startTime.setHours(startTime.getHours() + 2); // Default 2 hours duration
+
+                var endTimeString = startTime.toISOString().slice(0, 16);
+                $('#ThoiGianKT').val(endTimeString);
+
+                validateDuration();
+            });
+
+            // Validate duration when end time changes
+            $('#ThoiGianKT').change(function() {
+                validateDuration();
+            });
+
+            // Check room capacity when room or participants change
+            $('#phongMaySelect, #soNguoiThamGia').change(function() {
+                checkRoomCapacity();
+            });
+
+            // Quick schedule buttons
+            $('.quick-schedule').click(function() {
+                var hours = $(this).data('hours');
+                var purpose = $(this).data('purpose');
+
+                // Set current time + 1 hour as start time
+                var startTime = new Date();
+                startTime.setHours(startTime.getHours() + 1);
+                startTime.setMinutes(0);
+                startTime.setSeconds(0);
+
+                var endTime = new Date(startTime);
+                endTime.setHours(endTime.getHours() + hours);
+
+                $('#ThoiGianBD').val(startTime.toISOString().slice(0, 16));
+                $('#ThoiGianKT').val(endTime.toISOString().slice(0, 16));
+                $('#mucDichSelect').val(purpose);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Đã áp dụng mẫu!',
+                    text: `Lịch ${purpose} trong ${hours} giờ`,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+                validateDuration();
+            });
+
+            // Preview functionality
+            $('#previewBtn').click(function() {
+                var phongMay = $('#phongMaySelect option:selected').text();
+                var soNguoi = $('#soNguoiThamGia').val();
+                var thoiGianBD = $('#ThoiGianBD').val();
+                var thoiGianKT = $('#ThoiGianKT').val();
+                var mucDich = $('#mucDichSelect').val();
+                var monHoc = $('input[name="MonHoc"]').val();
+
+                if (!thoiGianBD || !thoiGianKT) {
+                    Swal.fire('Lỗi!', 'Vui lòng chọn thời gian trước khi xem trước!', 'warning');
+                    return;
+                }
+
+                var startDate = new Date(thoiGianBD);
+                var endDate = new Date(thoiGianKT);
+                var duration = (endDate - startDate) / (1000 * 60 * 60); // hours
+
+                var previewHtml = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Phòng máy:</strong> ${phongMay || 'Chưa chọn'}<br>
+                            <strong>Số người:</strong> ${soNguoi || 'Chưa nhập'} người<br>
+                            <strong>Mục đích:</strong> ${mucDich || 'Chưa chọn'}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Bắt đầu:</strong> ${startDate.toLocaleString('vi-VN')}<br>
+                            <strong>Kết thúc:</strong> ${endDate.toLocaleString('vi-VN')}<br>
+                            <strong>Thời lượng:</strong> ${duration.toFixed(1)} giờ
+                        </div>
+                    </div>
+                `;
+
+                if (monHoc) {
+                    previewHtml += `<div class="mt-2"><strong>Môn học:</strong> ${monHoc}</div>`;
+                }
+
+                $('#previewContent').html(previewHtml);
+                $('#previewSection').slideDown();
+            });
+
+            // Load recent schedules
+            loadRecentSchedules();
+
+            // Real-time validation
+            $('input, select').on('blur change', function() {
+                if ($(this).attr('required')) {
+                    if ($(this).val()) {
+                        $(this).removeClass('is-invalid').addClass('is-valid');
+                    } else {
+                        $(this).removeClass('is-valid').addClass('is-invalid');
+                    }
+                }
+            });
+        });
+
+        function validateDuration() {
+            var startTime = new Date($('#ThoiGianBD').val());
+            var endTime = new Date($('#ThoiGianKT').val());
+
+            if (startTime && endTime) {
+                var duration = (endTime - startTime) / (1000 * 60 * 60); // hours
+
+                if (duration < 1) {
+                    $('#ThoiGianKT')[0].setCustomValidity('Thời gian thực hành tối thiểu là 1 giờ');
+                    $('#ThoiGianKT').addClass('is-invalid');
+                } else if (duration > 8) {
+                    $('#ThoiGianKT')[0].setCustomValidity('Thời gian thực hành tối đa là 8 giờ');
+                    $('#ThoiGianKT').addClass('is-invalid');
+                } else {
+                    $('#ThoiGianKT')[0].setCustomValidity('');
+                    $('#ThoiGianKT').removeClass('is-invalid').addClass('is-valid');
+                }
+            }
+        }
+
+        function checkRoomCapacity() {
+            var capacity = $('#phongMaySelect option:selected').data('capacity');
+            var participants = parseInt($('#soNguoiThamGia').val());
+
+            if (capacity && participants && participants > capacity) {
+                $('#capacityWarning').show();
+                $('#soNguoiThamGia').addClass('is-invalid');
+            } else {
+                $('#capacityWarning').hide();
+                $('#soNguoiThamGia').removeClass('is-invalid');
+            }
+        }
+
+        function loadRecentSchedules() {
+            // Simulate loading recent schedules
+            setTimeout(function() {
+                var sampleSchedules = `
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <div class="card border-primary">
+                                <div class="card-body py-2">
+                                    <h6 class="card-title mb-1">Lập trình Java</h6>
+                                    <small class="text-muted">15/06/2025 08:00 - 11:00</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <div class="card border-success">
+                                <div class="card-body py-2">
+                                    <h6 class="card-title mb-1">Mạng máy tính</h6>
+                                    <small class="text-muted">10/06/2025 14:00 - 17:00</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                $('#recentSchedules').html(sampleSchedules);
+            }, 1000);
+        }
+    </script>
+
+     @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    } 
+}

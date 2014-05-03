@@ -1,0 +1,446 @@
+﻿@model QLVatTuPhongThiNghiem.Models.ViewModels.SearchTrangTBViewModel
+@{
+    ViewData["Title"] = "Quản lý thiết bị";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>Quản lý thiết bị</h3>
+                </div>
+                <div class="col-6">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index", "Dashboard")">
+                                <i data-feather="home"></i>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">Thiết bị</li>
+                        <li class="breadcrumb-item active">Danh sách</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <!-- Alert Messages -->
+        <div class="row">
+            <div class="col-sm-12">
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i data-feather="check-circle"></i>
+                        @TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i data-feather="alert-circle"></i>
+                        @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Filter Card -->
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header bg-primary">
+                        <h5 class="text-white mb-0">
+                            <i data-feather="filter" class="me-2"></i>Bộ lọc tìm kiếm
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="get" asp-action="Index" class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label">Phòng máy</label>
+                                <select class="form-select" asp-for="MaPhongMay">
+                                    <option value="">-- Tất cả phòng --</option>
+                                    @if (ViewBag.PhongMayList != null)
+                                    {
+                                        @foreach (var item in (IEnumerable<QLVatTuPhongThiNghiem.Models.Entities.PhongMay>)ViewBag.PhongMayList)
+                                        {
+                                            <option value="@item.MaPhongMay">@item.TenPhongMay</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Loại thiết bị</label>
+                                <select class="form-select" asp-for="MaLoai">
+                                    <option value="">-- Tất cả loại --</option>
+                                    @if (ViewBag.LoaiList != null)
+                                    {
+                                        @foreach (var item in (IEnumerable<QLVatTuPhongThiNghiem.Models.Entities.Loai>)ViewBag.LoaiList)
+                                        {
+                                            <option value="@item.MaLoai">@item.TenLoai</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Thương hiệu</label>
+                                <select class="form-select" asp-for="MaThuongHieu">
+                                    <option value="">-- Tất cả thương hiệu --</option>
+                                    @if (ViewBag.ThuongHieuList != null)
+                                    {
+                                        @foreach (var item in (IEnumerable<QLVatTuPhongThiNghiem.Models.Entities.ThuongHieu>)ViewBag.ThuongHieuList)
+                                        {
+                                            <option value="@item.MaThuongHieu">@item.TenThuongHieu</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Tình trạng</label>
+                                <input type="text" class="form-control" asp-for="TinhTrang" placeholder="Nhập tình trạng">
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i data-feather="search"></i> Tìm kiếm
+                                </button>
+                                <a href="@Url.Action("Index", "TrangTB")" class="btn btn-secondary">
+                                    <i data-feather="refresh-cw"></i> Làm mới
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="row mb-3">
+            <div class="col-sm-12">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <a href="@Url.Action("Create", "TrangTB")" class="btn btn-success">
+                            <i data-feather="plus"></i> Thêm thiết bị
+                        </a>
+                        <a href="@Url.Action("Index", "XuatNhapTon")" class="btn btn-info">
+                            <i data-feather="archive"></i> Xuất nhập tồn
+                        </a>
+                        <a href="@Url.Action("ThongKeTheoPhong", "BaoCao")" class="btn btn-warning">
+                            <i data-feather="bar-chart-2"></i> Thống kê
+                        </a>
+                    </div>
+                    <div>
+                        <button onclick="exportToExcel()" class="btn btn-outline-success">
+                            <i data-feather="download"></i> Xuất Excel
+                        </button>
+                        <button onclick="printPage()" class="btn btn-outline-primary">
+                            <i data-feather="printer"></i> In
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        @if (Model.Results?.Any() == true)
+        {
+            <div class="row mb-4">
+                <div class="col-xl-3 col-md-6">
+                    <div class="card border-primary">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h4 class="text-success mb-0">@Model.Results.Count()</h4>
+                                    <p class="text-muted mb-0">Tổng thiết bị</p>
+                                </div>
+                                <i data-feather="box" class="text-primary" style="width: 48px; height: 48px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="card border-success">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h4 class="text-success mb-0">@Model.Results.Count(x => x.TinhTrang == "Tốt")</h4>
+                                    <p class="text-muted mb-0">Thiết bị tốt</p>
+                                </div>
+                                <i data-feather="check-circle" class="text-success" style="width: 48px; height: 48px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="card border-warning">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h4 class="text-warning mb-0">@Model.Results.Count(x => x.TinhTrang == "Khá tốt")</h4>
+                                    <p class="text-muted mb-0">Khá tốt</p>
+                                </div>
+                                <i data-feather="tool" class="text-warning" style="width: 48px; height: 48px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="card border-danger">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h4 class="text-danger mb-0">@Model.Results.Count(x => x.TinhTrang == "Hỏng")</h4>
+                                    <p class="text-muted mb-0">Thiết bị hỏng</p>
+                                </div>
+                                <i data-feather="x-circle" class="text-danger" style="width: 48px; height: 48px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Main Table -->
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header bg-dark">
+                        <h5 class="text-white mb-0">
+                            <i data-feather="list" class="me-2"></i>Danh sách thiết bị
+                            <span class="badge bg-light text-dark ms-2">@Model.Results.Count() kết quả</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.Results?.Any() == true)
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="thietBiTable">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>STT</th>
+                                            <th>Mã TB</th>
+                                            <th>Phòng máy</th>
+                                            <th>Loại TB</th>
+                                            <th>Thương hiệu</th>
+                                            <th>Giá tiền</th>
+                                            <th>Tình trạng</th>
+                                            <th>Ngày nhập</th>
+                                            <th>Số lần sửa</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int index = 1;
+                                        }
+                                        @foreach (var item in Model.Results)
+                                        {
+                                            <tr>
+                                                <td>@index</td>
+                                                <td>
+                                                    <code>@item.MaTTB</code>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-info">@item.TenPhongMay</span>
+                                                </td>
+                                                <td>@item.TenLoai</td>
+                                                <td>@item.TenThuongHieu</td>
+                                                <td>
+                                                    <strong>@String.Format("{0:N0}", item.GiaTien)</strong>
+                                                    <small class="text-muted d-block">VNĐ</small>
+                                                </td>
+                                                <td>
+                                                    @if (item.TinhTrang == "Tốt")
+                                                    {
+                                                        <span class="badge bg-success">@item.TinhTrang</span>
+                                                    }
+                                                    else if (item.TinhTrang == "Hỏng")
+                                                    {
+                                                        <span class="badge bg-danger">@item.TinhTrang</span>
+                                                    }
+                                                    else if (item.TinhTrang == "Đang sửa chữa")
+                                                    {
+                                                        <span class="badge bg-warning">@item.TinhTrang</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-secondary">@item.TinhTrang</span>
+                                                    }
+                                                </td>
+                                                <td>@item.NgayNhap.ToString("dd/MM/yyyy")</td>
+                                                <td>
+                                                    <span class="badge bg-light text-dark">@item.SoLanSua</span>
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group btn-group-sm">
+                                                        <a href="@Url.Action("Details", "TrangTB", new { id = item.MaTTB })"
+                                                           class="btn btn-info" title="Chi tiết">
+                                                            <i data-feather="eye"></i>
+                                                        </a>
+                                                        <a href="@Url.Action("Edit", "TrangTB", new { id = item.MaTTB })"
+                                                           class="btn btn-warning" title="Sửa">
+                                                            <i data-feather="edit"></i>
+                                                        </a>
+                                                        <button type="button" class="btn btn-danger"
+                                                                onclick="deleteItem(@item.MaTTB)" title="Xóa">
+                                                            <i data-feather="trash-2"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            index++;
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Pagination -->
+                            @if (Model.TotalRecords > Model.PageSize)
+                            {
+                                var totalPages = (int)Math.Ceiling((double)Model.TotalRecords / Model.PageSize);
+                                <nav aria-label="Page navigation" class="mt-3">
+                                    <ul class="pagination justify-content-center">
+                                        @if (Model.PageNumber > 1)
+                                        {
+                                            <li class="page-item">
+                                                <a class="page-link" href="?PageNumber=@(Model.PageNumber - 1)">
+                                                    <i data-feather="chevron-left"></i> Trước
+                                                </a>
+                                            </li>
+                                        }
+
+                                        @for (int i = Math.Max(1, Model.PageNumber - 2); i <= Math.Min(totalPages, Model.PageNumber + 2); i++)
+                                        {
+                                            <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                                                <a class="page-link" href="?PageNumber=@i">@i</a>
+                                            </li>
+                                        }
+
+                                        @if (Model.PageNumber < totalPages)
+                                        {
+                                            <li class="page-item">
+                                                <a class="page-link" href="?PageNumber=@(Model.PageNumber + 1)">
+                                                    Sau <i data-feather="chevron-right"></i>
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </nav>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <i data-feather="box" size="64" class="text-muted mb-3"></i>
+                                <h5 class="text-muted">Không tìm thấy thiết bị nào</h5>
+                                <p class="text-muted">Hãy <a href="@Url.Action("Create", "TrangTB")">thêm thiết bị mới</a> hoặc thay đổi bộ lọc tìm kiếm.</p>
+                            </div>
+                        }
+                    </div>
+                    @if (Model.Results?.Any() == true)
+                    {
+                        <div class="card-footer bg-light">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="text-muted">
+                                        Hiển thị @Model.Results.Count() / @Model.TotalRecords thiết bị
+                                    </span>
+                                </div>
+                                <div>
+                                    <small class="text-muted">
+                                        Trang @Model.PageNumber / @Math.Ceiling((double)Model.TotalRecords / Model.PageSize)
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        function deleteItem(id) {
+            Swal.fire({
+                title: 'Xác nhận xóa',
+                text: 'Bạn có chắc chắn muốn xóa thiết bị này?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("Delete", "TrangTB")',
+                        type: 'POST',
+                        data: { id: id },
+                        success: function(result) {
+                            if (result.success) {
+                                Swal.fire('Đã xóa!', result.message, 'success');
+                                location.reload();
+                            } else {
+                                Swal.fire('Lỗi!', result.message, 'error');
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Lỗi!', 'Có lỗi xảy ra khi xóa thiết bị', 'error');
+                        }
+                    });
+                }
+            });
+        }
+
+        function exportToExcel() {
+            var table = document.getElementById("thietBiTable");
+            if (table) {
+                var wb = XLSX.utils.table_to_book(table, {sheet:"Danh sách thiết bị"});
+                var filename = "DanhSachThietBi_" + new Date().toISOString().split('T')[0];
+                XLSX.writeFile(wb, filename + ".xlsx");
+
+                Swal.fire('Thành công!', 'Xuất Excel thành công!', 'success');
+            } else {
+                Swal.fire('Lỗi!', 'Không có dữ liệu để xuất!', 'warning');
+            }
+        }
+
+        function printPage() {
+            window.print();
+        }
+
+        $(document).ready(function() {
+            // Initialize feather icons
+            feather.replace();
+
+            // Initialize DataTable for large datasets
+        @if (Model.Results?.Count() > 10)
+        {
+            <text>
+                    $('#thietBiTable').DataTable({
+                        "language": {
+                            "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/vi.json"
+                        },
+                        "pageLength": 25,
+                        "order": [[1, "asc"]], // Sort by Mã TB
+                        "columnDefs": [
+                            { "orderable": false, "targets": [9] } // Disable sorting for action column
+                        ]
+                    });
+            </text>
+        }
+
+            // Add hover effects
+            $('.card.border-primary, .card.border-success, .card.border-warning, .card.border-danger').hover(
+                function() { $(this).addClass('shadow-sm'); },
+                function() { $(this).removeClass('shadow-sm'); }
+            );
+        });
+    </script>
+}
