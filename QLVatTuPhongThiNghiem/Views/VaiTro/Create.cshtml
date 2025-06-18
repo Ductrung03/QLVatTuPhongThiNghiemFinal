@@ -1,0 +1,123 @@
+﻿@model QLVatTuPhongThiNghiem.Models.ViewModels.VaiTroViewModel
+@{
+    ViewData["Title"] = "Tạo vai trò mới";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>Tạo vai trò mới</h3>
+                </div>
+                <div class="col-6">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Dashboard")"><i data-feather="home"></i></a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index")">Vai trò</a></li>
+                        <li class="breadcrumb-item active">Tạo mới</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Thông tin vai trò</h5>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="Create" method="post">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="TenVaiTro" class="control-label"></label>
+                                        <input asp-for="TenVaiTro" class="form-control" />
+                                        <span asp-validation-for="TenVaiTro" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Trạng thái</label>
+                                        <div class="form-check">
+                                            <input asp-for="TrangThai" class="form-check-input" type="checkbox" checked />
+                                            <label asp-for="TrangThai" class="form-check-label">
+                                                Vai trò hoạt động
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="MoTa" class="control-label"></label>
+                                <textarea asp-for="MoTa" class="form-control" rows="3"></textarea>
+                                <span asp-validation-for="MoTa" class="text-danger"></span>
+                            </div>
+
+                            <!-- Phân quyền cho vai trò -->
+                            <div class="form-group">
+                                <label class="control-label">Quyền hạn</label>
+                                <div class="row">
+                                    @if (ViewBag.QuyenHanList != null)
+                                    {
+                                        @foreach (var permission in (IEnumerable<QLVatTuPhongThiNghiem.Models.ViewModels.QuyenHanViewModel>)ViewBag.QuyenHanList)
+                                        {
+                                            <div class="col-md-6 mb-2">
+                                                <div class="form-check">
+                                                    <input class="form-check-input permission-checkbox"
+                                                           type="checkbox"
+                                                           value="@permission.MaQuyen"
+                                                           id="permission_@permission.MaQuyen"
+                                                           name="DanhSachQuyen" />
+                                                    <label class="form-check-label" for="permission_@permission.MaQuyen">
+                                                        <strong>@permission.TenQuyen</strong>
+                                                        @if (!string.IsNullOrEmpty(permission.MoTa))
+                                                        {
+                                                            <br>
+
+                                                            <small class="text-muted">@permission.MoTa</small>
+                                                        }
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="col-12">
+                                            <div class="alert alert-warning">
+                                                Chưa có quyền hạn nào được định nghĩa trong hệ thống
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">
+                                    <i data-feather="save"></i> Tạo vai trò
+                                </button>
+                                <a asp-action="Index" class="btn btn-secondary">
+                                    <i data-feather="x"></i> Hủy
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        feather.replace();
+    });
+</script>

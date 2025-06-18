@@ -1,0 +1,126 @@
+﻿@{
+    ViewData["Title"] = "Phân quyền người dùng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>Phân quyền người dùng</h3>
+                </div>
+                <div class="col-6">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Dashboard")"><i data-feather="home"></i></a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index")">Người dùng</a></li>
+                        <li class="breadcrumb-item active">Phân quyền</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Phân quyền cho: @ViewBag.User?.HoTen (@ViewBag.User?.TenDangNhap)</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="assignRolesForm">
+                            <input type="hidden" id="userId" value="@ViewBag.User?.MaNguoiDung" />
+
+                            <div class="row">
+                                @if (ViewBag.VaiTroList != null)
+                                {
+                                    @foreach (var role in (IEnumerable<QLVatTuPhongThiNghiem.Models.Entities.VaiTro>)ViewBag.VaiTroList)
+                                    {
+                                        <div class="col-md-6 mb-3">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input role-checkbox"
+                                                               type="checkbox"
+                                                               value="@role.MaVaiTro"
+                                                               id="role_@role.MaVaiTro">
+                                                        <label class="form-check-label" for="role_@role.MaVaiTro">
+                                                            <strong>@role.TenVaiTro</strong>
+                                                        </label>
+                                                    </div>
+                                                    @if (!string.IsNullOrEmpty(role.MoTa))
+                                                    {
+                                                        <small class="text-muted d-block mt-1">@role.MoTa</small>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="col-12">
+                                        <div class="alert alert-warning">
+                                            Chưa có vai trò nào được định nghĩa trong hệ thống
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="form-group mt-3">
+                                <button type="button" id="saveRoles" class="btn btn-primary">
+                                    <i data-feather="save"></i> Lưu phân quyền
+                                </button>
+                                <a asp-action="Index" class="btn btn-secondary">
+                                    <i data-feather="arrow-left"></i> Quay lại
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        feather.replace();
+
+        // Load current roles for user
+        loadCurrentRoles();
+
+        $('#saveRoles').click(function() {
+            saveRoles();
+        });
+    });
+
+    function loadCurrentRoles() {
+        // This function would typically load the current roles via AJAX
+        // For now, we'll leave it empty as the backend would handle this
+    }
+
+    function saveRoles() {
+        var userId = $('#userId').val();
+        var selectedRoles = [];
+
+        $('.role-checkbox:checked').each(function() {
+            selectedRoles.push(parseInt($(this).val()));
+        });
+
+        $.post('@Url.Action("AssignRoles")', {
+            userId: userId,
+            roleIds: selectedRoles
+        }, function(result) {
+            if (result.success) {
+                alert('Phân quyền thành công!');
+                window.location.href = '@Url.Action("Index")';
+            } else {
+                alert('Lỗi: ' + result.message);
+            }
+        }).fail(function() {
+            alert('Có lỗi xảy ra. Vui lòng thử lại!');
+        });
+    }
+</script>

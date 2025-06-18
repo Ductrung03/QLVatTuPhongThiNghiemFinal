@@ -33,21 +33,20 @@
                     <div>
                         <div><a class="logo" href="#"><img class="img-fluid for-light" src="~/assets/images/logo/logo.png" alt="looginpage"><img class="img-fluid for-dark" src="~/assets/images/logo/logo_dark.png" alt="looginpage"></a></div>
                         <div class="login-main">
-                            <form class="theme-form" asp-controller="Auth" asp-action="Login" method="post">
+                            <!-- 🔍 DEBUG: Hiển thị URL action -->
+                            <div class="alert alert-info">
+                                <strong>DEBUG:</strong> Form action: @Url.Action("Login", "Auth")<br>
+                                Current URL: @Context.Request.Path<br>
+                                Method: @Context.Request.Method
+                            </div>
+
+                            <form class="theme-form" action="@Url.Action("Login", "Auth")" method="post" id="loginForm">
 
                                 <h4>Đăng nhập vào hệ thống</h4>
                                 <p>Nhập tên đăng nhập và mật khẩu để tiếp tục</p>
 
-                                <!-- ✅ Sửa logic validation -->
-                                @if (!ViewData.ModelState.IsValid)
-                                {
-                                    <div class="alert alert-danger">
-                                        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-                                        {
-                                            <div>@error.ErrorMessage</div>
-                                        }
-                                    </div>
-                                }
+                                <!-- Validation Summary -->
+                                <div asp-validation-summary="All" class="alert alert-danger"></div>
 
                                 <!-- ✅ Hiển thị thông báo lỗi từ TempData -->
                                 @if (TempData["ErrorMessage"] != null)
@@ -65,7 +64,7 @@
                                     </div>
                                 }
 
-                                <!-- ✅ Thêm Anti-forgery token -->
+                                <!-- ✅ Anti-forgery token -->
                                 @Html.AntiForgeryToken()
 
                                 <div class="form-group">
@@ -88,7 +87,7 @@
                                         <input id="checkbox1" type="checkbox" asp-for="RememberMe">
                                         <label class="text-muted" for="checkbox1">Ghi nhớ đăng nhập</label>
                                     </div>
-                                    <button class="btn btn-primary btn-block w-100" type="submit">Đăng nhập</button>
+                                    <button class="btn btn-primary btn-block w-100" type="submit" id="submitBtn">Đăng nhập</button>
                                 </div>
 
                                 <div class="login-social-title">
@@ -113,6 +112,19 @@
 
         <script>
             $(document).ready(function() {
+                console.log('🔍 DOM Ready');
+                console.log('🔍 Form action:', $('#loginForm').attr('action'));
+                console.log('🔍 Form method:', $('#loginForm').attr('method'));
+                console.log('🔍 Expected action: /Auth/Login');
+
+                // Verify form action is correct
+                var formAction = $('#loginForm').attr('action');
+                if (formAction !== '/Auth/Login') {
+                    console.error('❌ Form action is wrong! Expected: /Auth/Login, Got:', formAction);
+                    $('#loginForm').attr('action', '/Auth/Login');
+                    console.log('✅ Fixed form action to: /Auth/Login');
+                }
+
                 // Show/Hide password
                 $(".show-hide").click(function() {
                     $(this).toggleClass("show");
@@ -124,24 +136,53 @@
                     }
                 });
 
-                // ✅ Debug form submit
-                $('form').on('submit', function(e) {
-                    console.log('Form đang được submit...');
-                    console.log('Action:', $(this).attr('action'));
-                    console.log('Method:', $(this).attr('method'));
+                // ✅ Enhanced form submit debugging
+                $('#loginForm').on('submit', function(e) {
+                    e.preventDefault(); // Prevent default form submission
 
-                    // Kiểm tra dữ liệu form
-                    var username = $('input[name="TenDangNhap"]').val();
-                    var password = $('input[name="MatKhau"]').val();
+                    console.log('🚀 Form submit triggered!');
 
-                    console.log('Username:', username);
-                    console.log('Password length:', password.length);
+                    // Disable submit button to prevent double submission
+                    $('#submitBtn').prop('disabled', true).text('Đang đăng nhập...');
 
-                    if (!username || !password) {
-                        e.preventDefault();
-                        alert('Vui lòng nhập đầy đủ thông tin!');
-                        return false;
-                    }
+                    // Get form data
+                    var formData = $(this).serialize();
+                    console.log('🔍 Form data:', formData);
+
+                    // Submit via AJAX
+                    $.ajax({
+                        url: '/Auth/Login',
+                        type: 'POST',
+                        data: formData,
+                        success: function(response) {
+                            console.log('✅ Login success:', response);
+                            // If response is HTML (redirect), navigate manually
+                            if (typeof response === 'string' && response.includes('<!DOCTYPE')) {
+                                window.location.href = '/Dashboard';
+                            } else {
+                                // Handle JSON response
+                                window.location.reload();
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('❌ Login error:', xhr.responseText);
+                            $('#submitBtn').prop('disabled', false).text('Đăng nhập');
+
+                            // Show error message
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                alert('Lỗi: ' + xhr.responseJSON.message);
+                            } else {
+                                alert('Có lỗi xảy ra. Vui lòng thử lại.');
+                            }
+                        }
+                    });
+
+                    return false;
+                });
+
+                // Monitor form changes
+                $('input').on('change input', function() {
+                    console.log(`🔍 Field changed: ${this.name} = ${this.value}`);
                 });
             });
         </script>

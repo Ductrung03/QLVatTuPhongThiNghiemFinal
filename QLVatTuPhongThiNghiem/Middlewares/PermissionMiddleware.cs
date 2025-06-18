@@ -17,8 +17,9 @@ namespace QLVatTuPhongThiNghiem.Middlewares
         {
             // Bỏ qua kiểm tra cho các route không cần xác thực
             var path = context.Request.Path.Value?.ToLower();
+            var method = context.Request.Method.ToUpper();
 
-            if (IsPublicRoute(path))
+            if (IsPublicRoute(path, method))
             {
                 await _next(context);
                 return;
@@ -35,7 +36,6 @@ namespace QLVatTuPhongThiNghiem.Middlewares
             // Kiểm tra quyền hạn cho các action cụ thể
             var controller = context.Request.RouteValues["controller"]?.ToString();
             var action = context.Request.RouteValues["action"]?.ToString();
-            var method = context.Request.Method;
 
             if (!string.IsNullOrEmpty(controller) && !string.IsNullOrEmpty(action))
             {
@@ -70,25 +70,41 @@ namespace QLVatTuPhongThiNghiem.Middlewares
             await _next(context);
         }
 
-        private bool IsPublicRoute(string path)
+        private bool IsPublicRoute(string path, string method)
         {
+            // Routes không cần authentication
             var publicRoutes = new[]
             {
-                "/auth/login",
-                "/auth/accessdenied",
-                "/home/error",
+                "/auth/login",           // Cả GET và POST
+                "/auth/logout",          // POST logout  
+                "/auth/accessdenied",    // GET
+                "/home/error",           // GET
                 "/favicon.ico",
                 "/css/",
                 "/js/",
                 "/lib/",
-                "/images/"
+                "/images/",
+                "/assets/"
             };
+
+            // ✅ Kiểm tra đặc biệt cho Auth controller
+            if (path?.StartsWith("/auth") == true)
+            {
+                // Cho phép tất cả các action trong Auth controller
+                return true;
+            }
 
             return publicRoutes.Any(route => path?.StartsWith(route) == true);
         }
 
         private string GetRequiredPermission(string controller, string action, string method)
         {
+            // ✅ Bỏ qua kiểm tra quyền cho Auth controller
+            if (controller?.ToLower() == "auth")
+            {
+                return null;
+            }
+
             // Mapping controller/action với quyền hạn
             var permissionMap = new Dictionary<string, Dictionary<string, string>>
             {
@@ -144,4 +160,3 @@ namespace QLVatTuPhongThiNghiem.Middlewares
         }
     }
 }
-

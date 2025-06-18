@@ -1,0 +1,113 @@
+﻿@model IEnumerable<QLVatTuPhongThiNghiem.Models.Entities.VaiTro>
+@{
+    ViewData["Title"] = "Quản lý vai trò";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>Quản lý vai trò</h3>
+                </div>
+                <div class="col-6">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Dashboard")"><i data-feather="home"></i></a></li>
+                        <li class="breadcrumb-item active">Vai trò</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <!-- Hiển thị thông báo -->
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show">
+                        @TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Danh sách vai trò</h5>
+                        <div class="card-header-right">
+                            <a href="@Url.Action("Create")" class="btn btn-primary">
+                                <i data-feather="plus"></i> Tạo vai trò mới
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Mã vai trò</th>
+                                        <th>Tên vai trò</th>
+                                        <th>Mô tả</th>
+                                        <th>Ngày tạo</th>
+                                        <th>Trạng thái</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model?.Any() == true)
+                                    {
+                                        @foreach (var role in Model)
+                                        {
+                                            <tr>
+                                                <td>@role.MaVaiTro</td>
+                                                <td><strong>@role.TenVaiTro</strong></td>
+                                                <td>@role.MoTa</td>
+                                                <td>@role.NgayTao.ToString("dd/MM/yyyy")</td>
+                                                <td>
+                                                    @if (role.TrangThai)
+                                                    {
+                                                        <span class="badge badge-success">Hoạt động</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge badge-secondary">Khóa</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    <a href="@Url.Action("Permissions", new { id = role.MaVaiTro })" class="btn btn-sm btn-info">
+                                                        <i data-feather="shield"></i> Quyền hạn
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="6" class="text-center">Chưa có vai trò nào</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        feather.replace();
+    });
+</script>

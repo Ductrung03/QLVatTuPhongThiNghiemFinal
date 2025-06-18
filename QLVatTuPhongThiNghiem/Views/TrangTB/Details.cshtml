@@ -1,0 +1,319 @@
+﻿@model QLVatTuPhongThiNghiem.Models.ViewModels.TrangTBViewModel
+@{
+    ViewData["Title"] = "Chi tiết thiết bị";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>Chi tiết thiết bị</h3>
+                </div>
+                <div class="col-6">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index", "Dashboard")">
+                                <i data-feather="home"></i>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index", "TrangTB")">Thiết bị</a>
+                        </li>
+                        <li class="breadcrumb-item active">Chi tiết</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-xl-10 col-lg-12">
+                <!-- Alert Messages -->
+                @if (TempData["SuccessMessage"] != null)
+                {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i data-feather="check-circle"></i>
+                        @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                }
+
+                <!-- Main Info Card -->
+                <div class="card">
+                    <div class="card-header bg-info">
+                        <h5 class="text-white mb-0">
+                            <i data-feather="monitor" class="me-2"></i>Thông tin thiết bị - Mã @Model.MaTTB
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Basic Information -->
+                            <div class="col-md-6">
+                                <h6 class="mb-3">
+                                    <i data-feather="info" class="me-2"></i>Thông tin cơ bản
+                                </h6>
+                                <dl class="row">
+                                    <dt class="col-sm-4">Mã thiết bị:</dt>
+                                    <dd class="col-sm-8"><code class="fs-5">@Model.MaTTB</code></dd>
+
+                                    <dt class="col-sm-4">Phòng máy:</dt>
+                                    <dd class="col-sm-8">
+                                        <span class="badge bg-primary fs-6">@Model.TenPhongMay</span>
+                                    </dd>
+
+                                    <dt class="col-sm-4">Loại thiết bị:</dt>
+                                    <dd class="col-sm-8">@Model.TenLoai</dd>
+
+                                    <dt class="col-sm-4">Thương hiệu:</dt>
+                                    <dd class="col-sm-8">@Model.TenThuongHieu</dd>
+                                </dl>
+                            </div>
+
+                            <!-- Status and Value -->
+                            <div class="col-md-6">
+                                <h6 class="mb-3">
+                                    <i data-feather="dollar-sign" class="me-2"></i>Giá trị và tình trạng
+                                </h6>
+                                <dl class="row">
+                                    <dt class="col-sm-4">Giá tiền:</dt>
+                                    <dd class="col-sm-8">
+                                        <strong class="text-success fs-5">
+                                            @String.Format("{0:N0}", Model.GiaTien) VNĐ
+                                        </strong>
+                                    </dd>
+
+                                    <dt class="col-sm-4">Tình trạng:</dt>
+                                    <dd class="col-sm-8">
+                                        @if (Model.TinhTrang == "Tốt")
+                                        {
+                                                <span class="badge bg-success fs-6">@Model.TinhTrang</span>
+                                        }
+                                        else if (Model.TinhTrang == "Hỏng")
+                                        {
+                                                <span class="badge bg-danger fs-6">@Model.TinhTrang</span>
+                                        }
+                                        else if (Model.TinhTrang == "Đang sửa chữa")
+                                        {
+                                                <span class="badge bg-warning fs-6">@Model.TinhTrang</span>
+                                        }
+                                        else
+                                        {
+                                                <span class="badge bg-secondary fs-6">@Model.TinhTrang</span>
+                                        }
+                                    </dd>
+
+                                    <dt class="col-sm-4">Ngày nhập:</dt>
+                                    <dd class="col-sm-8">@Model.NgayNhap.ToString("dd/MM/yyyy")</dd>
+
+                                    <dt class="col-sm-4">Số lần sửa chữa:</dt>
+                                    <dd class="col-sm-8">
+                                        <span class="badge bg-light text-dark fs-6">@Model.SoLanSua lần</span>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Calculated Information -->
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6 class="mb-3">
+                                    <i data-feather="clock" class="me-2"></i>Thông tin tính toán
+                                </h6>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        @{
+                                            var thoiGianSuDung = DateTime.Now - Model.NgayNhap;
+                                            var soNam = (int)(thoiGianSuDung.TotalDays / 365);
+                                            var soThang = (int)((thoiGianSuDung.TotalDays % 365) / 30);
+                                            var soNgay = (int)(thoiGianSuDung.TotalDays % 30);
+                                        }
+                                        <div class="text-center">
+                                            <h4 class="text-primary">@soNam năm @soThang tháng</h4>
+                                            <p class="text-muted">Thời gian sử dụng</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="text-center">
+                                            @{
+                                                var tinhTrangMau = "";
+                                                if (Model.SoLanSua == 0) tinhTrangMau = "success";
+                                                else if (Model.SoLanSua <= 2) tinhTrangMau = "warning";
+                                                else tinhTrangMau = "danger";
+                                            }
+                                            <h4 class="text-@tinhTrangMau">@Model.SoLanSua</h4>
+                                            <p class="text-muted">Lần sửa chữa</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="text-center">
+                                            @{
+                                                var giaTriConLai = Model.GiaTien - (Model.GiaTien * soNam * 0.1);
+                                                if (giaTriConLai < 0) giaTriConLai = Model.GiaTien * 0.1;
+                                            }
+                                            <h4 class="text-info">@String.Format("{0:N0}", giaTriConLai) VNĐ</h4>
+                                            <p class="text-muted">Giá trị ước tính hiện tại</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Warning Messages -->
+                        @if (Model.SoLanSua > 3)
+                        {
+                                <div class="alert alert-warning mt-3">
+                                    <h6><i data-feather="alert-triangle"></i> Cảnh báo thiết bị</h6>
+                                    <p class="mb-0">
+                                        Thiết bị này đã được sửa chữa <strong>@Model.SoLanSua lần</strong>. 
+                                        Cân nhắc thay thế hoặc nâng cấp để đảm bảo hiệu quả sử dụng.
+                                    </p>
+                                </div>
+                        }
+
+                        @if (Model.TinhTrang == "Hỏng" || Model.TinhTrang == "Đang sửa chữa")
+                        {
+                                <div class="alert alert-danger mt-3">
+                                    <h6><i data-feather="alert-circle"></i> Thiết bị cần xử lý</h6>
+                                    <p class="mb-0">
+                                        Thiết bị hiện đang ở trạng thái <strong>@Model.TinhTrang</strong>. 
+                                        Vui lòng kiểm tra và xử lý kịp thời.
+                                    </p>
+                                </div>
+                        }
+
+                        @if (soNam >= 5)
+                        {
+                                <div class="alert alert-info mt-3">
+                                    <h6><i data-feather="info"></i> Thông tin khấu hao</h6>
+                                    <p class="mb-0">
+                                        Thiết bị đã được sử dụng hơn 5 năm. Cân nhắc đánh giá lại giá trị và kế hoạch thay thế.
+                                    </p>
+                                </div>
+                        }
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="card-footer bg-light">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <a href="@Url.Action("Index", "TrangTB")" class="btn btn-secondary">
+                                    <i data-feather="arrow-left"></i> Quay lại danh sách
+                                </a>
+                            </div>
+                            <div>
+                                <a href="@Url.Action("Edit", "TrangTB", new { id = Model.MaTTB })" class="btn btn-warning">
+                                    <i data-feather="edit"></i> Chỉnh sửa
+                                </a>
+                                <button type="button" class="btn btn-primary" onclick="printDetails()">
+                                    <i data-feather="printer"></i> In thông tin
+                                </button>
+                                <button type="button" class="btn btn-danger" onclick="deleteEquipment(@Model.MaTTB)">
+                                    <i data-feather="trash-2"></i> Xóa thiết bị
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="row mt-3">
+                    <div class="col-md-4">
+                        <div class="card border-success">
+                            <div class="card-header bg-success text-white">
+                                <h6 class="mb-0">
+                                    <i data-feather="star"></i> Đánh giá cấp độ
+                                </h6>
+                            </div>
+                            <div class="card-body text-center">
+                                <p class="text-muted">Đánh giá chất lượng thiết bị</p>
+                                <a href="@Url.Action("Create", "DanhGiaCapDo", new { maTTB = Model.MaTTB })" class="btn btn-success">
+                                    <i data-feather="plus"></i> Thêm đánh giá
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-warning">
+                            <div class="card-header bg-warning text-dark">
+                                <h6 class="mb-0">
+                                    <i data-feather="tool"></i> Sửa chữa bảo hành
+                                </h6>
+                            </div>
+                            <div class="card-body text-center">
+                                <p class="text-muted">Tạo phiếu sửa chữa</p>
+                                <a href="@Url.Action("Create", "SuaChua", new { maTTB = Model.MaTTB })" class="btn btn-warning">
+                                    <i data-feather="plus"></i> Tạo phiếu
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-info">
+                            <div class="card-header bg-info text-white">
+                                <h6 class="mb-0">
+                                    <i data-feather="archive"></i> Xuất nhập tồn
+                                </h6>
+                            </div>
+                            <div class="card-body text-center">
+                                <p class="text-muted">Quản lý xuất nhập</p>
+                                <a href="@Url.Action("Create", "XuatNhapTon", new { maTTB = Model.MaTTB })" class="btn btn-info">
+                                    <i data-feather="plus"></i> Tạo phiếu
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script {
+        <script>
+            function printDetails() {
+                window.print();
+            }
+
+            function deleteEquipment(id) {
+                Swal.fire({
+                    title: 'Xác nhận xóa thiết bị',
+                    text: 'Bạn có chắc chắn muốn xóa thiết bị này? Hành động này không thể hoàn tác!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Xóa thiết bị',
+                    cancelButtonText: 'Hủy bỏ'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '@Url.Action("Delete", "TrangTB")',
+                            type: 'POST',
+                            data: { id: id },
+                            success: function(result) {
+                                if (result.success) {
+                                    Swal.fire('Đã xóa!', result.message, 'success').then(() => {
+                                        window.location.href = '@Url.Action("Index", "TrangTB")';
+                                    });
+                                } else {
+                                    Swal.fire('Lỗi!', result.message, 'error');
+                                }
+                            },
+                            error: function() {
+                                Swal.fire('Lỗi!', 'Có lỗi xảy ra khi xóa thiết bị', 'error');
+                            }
+                        });
+                    }
+                });
+            }
+
+            $(document).ready(function() {
+                feather.replace();
+            });
+        </script>
+}

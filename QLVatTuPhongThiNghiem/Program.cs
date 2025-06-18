@@ -108,6 +108,11 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Auth}/{action=Login}/{id?}");
 
+app.MapControllerRoute(
+    name: "dashboard",
+    pattern: "Dashboard",
+    defaults: new { controller = "Dashboard", action = "Index" });
+
 // Ensure database is created and seeded
 using (var scope = app.Services.CreateScope())
 {
@@ -144,6 +149,7 @@ static async Task SeedDefaultDataAsync(AppDbContext context)
         if (!await context.NguoiDung.AnyAsync())
         {
             var salt = Guid.NewGuid().ToString();
+            var password = "Admin@123";
             var passwordHash = System.Security.Cryptography.SHA256.HashData(
                 System.Text.Encoding.UTF8.GetBytes("admin123" + salt));
             var hashString = Convert.ToBase64String(passwordHash);
@@ -152,7 +158,7 @@ static async Task SeedDefaultDataAsync(AppDbContext context)
             {
                 MaNguoiDung = 1,
                 TenDangNhap = "admin",
-                MatKhau = "Admin@123",
+                MatKhau = password,
                 MatKhauHash = hashString,
                 Salt = salt,
                 Email = "admin@lab.com",

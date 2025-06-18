@@ -1,0 +1,401 @@
+﻿@model QLVatTuPhongThiNghiem.Models.Entities.NhanVien
+@{
+    ViewData["Title"] = "Chỉnh sửa nhân viên";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>Chỉnh sửa nhân viên</h3>
+                </div>
+                <div class="col-6">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index", "Dashboard")">
+                                <i data-feather="home"></i>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("NhanVien", "MasterData")">Nhân viên</a>
+                        </li>
+                        <li class="breadcrumb-item active">Chỉnh sửa</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-xl-8 col-lg-10">
+                <div class="card">
+                    <div class="card-header bg-warning">
+                        <h5 class="text-dark mb-0">
+                            <i data-feather="edit" class="me-2"></i>Chỉnh sửa thông tin nhân viên - Mã @Model.MaNV
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="EditNhanVien" method="post" class="needs-validation" novalidate>
+                            <input asp-for="MaNV" type="hidden" />
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                            <!-- Mã nhân viên (readonly) -->
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">Mã nhân viên</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light">
+                                            <i data-feather="hash"></i>
+                                        </span>
+                                        <input type="text" class="form-control bg-light"
+                                               value="@Model.MaNV" readonly>
+                                    </div>
+                                    <small class="form-text text-muted">Mã nhân viên không thể thay đổi</small>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="HoTen" class="form-label">
+                                        Họ và tên <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i data-feather="user"></i>
+                                        </span>
+                                        <input asp-for="HoTen" class="form-control" placeholder="Nhập họ và tên" required />
+                                    </div>
+                                    <span asp-validation-for="HoTen" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="SoDienThoai" class="form-label">
+                                        Số điện thoại
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i data-feather="phone"></i>
+                                        </span>
+                                        <input asp-for="SoDienThoai" class="form-control" placeholder="Nhập số điện thoại" />
+                                    </div>
+                                    <span asp-validation-for="SoDienThoai" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="Email" class="form-label">
+                                        Email
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i data-feather="mail"></i>
+                                        </span>
+                                        <input asp-for="Email" type="email" class="form-control" placeholder="Nhập email" />
+                                    </div>
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="ChucVu" class="form-label">
+                                        Chức vụ
+                                    </label>
+                                    <select asp-for="ChucVu" class="form-select">
+                                        <option value="">-- Chọn chức vụ --</option>
+                                        <option value="Nhân viên">Nhân viên</option>
+                                        <option value="Kỹ thuật viên">Kỹ thuật viên</option>
+                                        <option value="Trưởng phòng">Trưởng phòng</option>
+                                        <option value="Phó phòng">Phó phòng</option>
+                                        <option value="Quản lý">Quản lý</option>
+                                        <option value="Thực tập sinh">Thực tập sinh</option>
+                                    </select>
+                                    <span asp-validation-for="ChucVu" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label asp-for="DiaChi" class="form-label">
+                                        Địa chỉ
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i data-feather="map-pin"></i>
+                                        </span>
+                                        <textarea asp-for="DiaChi" class="form-control" rows="2" placeholder="Nhập địa chỉ"></textarea>
+                                    </div>
+                                    <span asp-validation-for="DiaChi" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="NgayVaoLam" class="form-label">
+                                        Ngày vào làm
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i data-feather="calendar"></i>
+                                        </span>
+                                        <input asp-for="NgayVaoLam" type="date" class="form-control" />
+                                    </div>
+                                    <span asp-validation-for="NgayVaoLam" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="TrangThai" class="form-label">
+                                        Trạng thái
+                                    </label>
+                                    <div class="form-check form-switch">
+                                        <input asp-for="TrangThai" class="form-check-input" type="checkbox" />
+                                        <label class="form-check-label" asp-for="TrangThai">
+                                            Đang làm việc
+                                        </label>
+                                    </div>
+                                    <small class="form-text text-muted">
+                                        Bỏ tích để đánh dấu nhân viên đã nghỉ việc
+                                    </small>
+                                </div>
+                            </div>
+
+                            <!-- Thông tin thời gian làm việc -->
+                            @if (Model.NgayVaoLam.HasValue)
+                            {
+                                <div class="row">
+                                    <div class="col-12 mb-3">
+                                        <div class="alert alert-info">
+                                            <h6><i data-feather="clock"></i> Thông tin thời gian làm việc</h6>
+                                            @{
+                                                var thoiGianLamViec = DateTime.Now - Model.NgayVaoLam.Value;
+                                                var soNam = (int)(thoiGianLamViec.TotalDays / 365);
+                                                var soThang = (int)((thoiGianLamViec.TotalDays % 365) / 30);
+                                            }
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <strong>Ngày vào làm:</strong> @Model.NgayVaoLam.Value.ToString("dd/MM/yyyy")
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <strong>Thời gian làm việc:</strong> @soNam năm @soThang tháng
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            <hr>
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between">
+                                        <a href="@Url.Action("NhanVien", "MasterData")" class="btn btn-secondary">
+                                            <i data-feather="arrow-left"></i> Quay lại danh sách
+                                        </a>
+                                        <div>
+                                            <button type="button" class="btn btn-info me-2" id="previewBtn">
+                                                <i data-feather="eye"></i> Xem trước
+                                            </button>
+                                            <button type="reset" class="btn btn-warning me-2">
+                                                <i data-feather="refresh-cw"></i> Khôi phục
+                                            </button>
+                                            <button type="submit" class="btn btn-success">
+                                                <i data-feather="save"></i> Cập nhật
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Preview Modal -->
+                <div class="modal fade" id="previewModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header bg-info text-white">
+                                <h5 class="modal-title">
+                                    <i data-feather="eye"></i> Xem trước thông tin nhân viên
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body" id="previewContent">
+                                <!-- Content will be populated by JavaScript -->
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script {
+    <script>
+        $(document).ready(function() {
+            // Initialize feather icons
+            feather.replace();
+
+            // Store original values for reset functionality
+            const originalValues = {
+                hoTen: $('#HoTen').val(),
+                soDienThoai: $('#SoDienThoai').val(),
+                email: $('#Email').val(),
+                chucVu: $('#ChucVu').val(),
+                diaChi: $('#DiaChi').val(),
+                ngayVaoLam: $('#NgayVaoLam').val(),
+                trangThai: $('#TrangThai').prop('checked')
+            };
+
+            // Set max date to today for NgayVaoLam
+            $('#NgayVaoLam').attr('max', new Date().toISOString().split('T')[0]);
+
+            // Form validation
+            const form = document.querySelector('.needs-validation');
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            });
+
+            // Preview functionality
+            $('#previewBtn').click(function() {
+                var hoTen = $('#HoTen').val();
+                var soDienThoai = $('#SoDienThoai').val();
+                var email = $('#Email').val();
+                var chucVu = $('#ChucVu').val();
+                var diaChi = $('#DiaChi').val();
+                var ngayVaoLam = $('#NgayVaoLam').val();
+                var trangThai = $('#TrangThai').prop('checked');
+
+                var statusBadge = trangThai ? 
+                    '<span class="badge bg-success">Đang làm việc</span>' : 
+                    '<span class="badge bg-danger">Đã nghỉ</span>';
+
+                var previewHtml = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Thông tin cá nhân</h6>
+                            <dl class="row">
+                                <dt class="col-sm-5">Mã nhân viên:</dt>
+                                <dd class="col-sm-7"><code>@Model.MaNV</code></dd>
+                                <dt class="col-sm-5">Họ tên:</dt>
+                                <dd class="col-sm-7"><strong>${hoTen}</strong></dd>
+                                <dt class="col-sm-5">Số điện thoại:</dt>
+                                <dd class="col-sm-7">${soDienThoai || '<span class="text-muted">Chưa cập nhật</span>'}</dd>
+                                <dt class="col-sm-5">Email:</dt>
+                                <dd class="col-sm-7">${email || '<span class="text-muted">Chưa cập nhật</span>'}</dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Thông tin công việc</h6>
+                            <dl class="row">
+                                <dt class="col-sm-5">Chức vụ:</dt>
+                                <dd class="col-sm-7">${chucVu || '<span class="text-muted">Chưa cập nhật</span>'}</dd>
+                                <dt class="col-sm-5">Ngày vào làm:</dt>
+                                <dd class="col-sm-7">${ngayVaoLam ? new Date(ngayVaoLam).toLocaleDateString('vi-VN') : '<span class="text-muted">Chưa cập nhật</span>'}</dd>
+                                <dt class="col-sm-5">Trạng thái:</dt>
+                                <dd class="col-sm-7">${statusBadge}</dd>
+                                <dt class="col-sm-5">Địa chỉ:</dt>
+                                <dd class="col-sm-7">${diaChi || '<span class="text-muted">Chưa cập nhật</span>'}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                `;
+
+                $('#previewContent').html(previewHtml);
+                $('#previewModal').modal('show');
+            });
+
+            // Custom reset functionality
+            $('button[type="reset"]').click(function(e) {
+                e.preventDefault();
+
+                Swal.fire({
+                    title: 'Khôi phục dữ liệu?',
+                    text: 'Bạn có muốn khôi phục về dữ liệu ban đầu không?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Khôi phục',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Restore original values
+                        $('#HoTen').val(originalValues.hoTen);
+                        $('#SoDienThoai').val(originalValues.soDienThoai);
+                        $('#Email').val(originalValues.email);
+                        $('#ChucVu').val(originalValues.chucVu);
+                        $('#DiaChi').val(originalValues.diaChi);
+                        $('#NgayVaoLam').val(originalValues.ngayVaoLam);
+                        $('#TrangThai').prop('checked', originalValues.trangThai);
+
+                        // Remove validation classes
+                        form.classList.remove('was-validated');
+
+                        Swal.fire('Thành công!', 'Đã khôi phục dữ liệu ban đầu', 'success');
+                    }
+                });
+            });
+
+            // Real-time validation
+            $('input, select, textarea').on('blur change', function() {
+                if ($(this).attr('required')) {
+                    if ($(this).val()) {
+                        $(this).removeClass('is-invalid').addClass('is-valid');
+                    } else {
+                        $(this).removeClass('is-valid').addClass('is-invalid');
+                    }
+                }
+            });
+
+            // Phone number formatting
+            $('#SoDienThoai').on('input', function() {
+                var value = $(this).val().replace(/\D/g, '');
+                if (value.length > 10) {
+                    value = value.slice(0, 10);
+                }
+                $(this).val(value);
+            });
+
+            // Email validation
+            $('#Email').on('blur', function() {
+                var email = $(this).val();
+                if (email && !isValidEmail(email)) {
+                    $(this).addClass('is-invalid');
+                } else if (email) {
+                    $(this).removeClass('is-invalid').addClass('is-valid');
+                }
+            });
+
+            // Confirm before leaving if form is dirty
+            var formChanged = false;
+            $('input, select, textarea').on('change', function() {
+                formChanged = true;
+            });
+
+            $(window).on('beforeunload', function() {
+                if (formChanged) {
+                    return 'Bạn có thay đổi chưa được lưu. Bạn có chắc chắn muốn rời khỏi trang?';
+                }
+            });
+
+            $('form').on('submit', function() {
+                formChanged = false;
+            });
+        });
+
+       
+    </script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
