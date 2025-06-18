@@ -9,7 +9,7 @@ using QLVatTuPhongThiNghiem.Repositories.Implements;
 using QLVatTuPhongThiNghiem.Services.Interfaces;
 using QLVatTuPhongThiNghiem.Services.Implements;
 using QLVatTuPhongThiNghiem.Extensions;
-using Cuba_Staterkit.Services.Interfaces;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -57,7 +57,7 @@ builder.Services.AddScoped<ISuaChuaRepository, SuaChuaRepository>();
 builder.Services.AddScoped<IDanhGiaCapDoRepository, DanhGiaCapDoRepository>();
 builder.Services.AddScoped<IXuatNhapTonRepository, XuatNhapTonRepository>();
 builder.Services.AddScoped<IBaoCaoRepository, BaoCaoRepository>();
-builder.Services.AddScoped<MasterDataRepository>();
+builder.Services.AddScoped<IMasterDataRepository,MasterDataRepository>();
 
 // Register Services
 // Authentication & Security Services
@@ -100,6 +100,7 @@ app.UseSession();
 // Use Permission Middleware
 app.UsePermissionMiddleware();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 // Configure routing
@@ -142,7 +143,6 @@ static async Task SeedDefaultDataAsync(AppDbContext context)
         // Seed default admin user if not exists
         if (!await context.NguoiDung.AnyAsync())
         {
-            // Create default admin
             var salt = Guid.NewGuid().ToString();
             var passwordHash = System.Security.Cryptography.SHA256.HashData(
                 System.Text.Encoding.UTF8.GetBytes("admin123" + salt));
@@ -152,6 +152,7 @@ static async Task SeedDefaultDataAsync(AppDbContext context)
             {
                 MaNguoiDung = 1,
                 TenDangNhap = "admin",
+                MatKhau = "Admin@123",
                 MatKhauHash = hashString,
                 Salt = salt,
                 Email = "admin@lab.com",
@@ -163,45 +164,53 @@ static async Task SeedDefaultDataAsync(AppDbContext context)
             context.NguoiDung.Add(adminUser);
         }
 
-        // Seed default roles if not exists
+        // Seed VaiTro (lưu trước để lấy ID sinh ra)
         if (!await context.VaiTro.AnyAsync())
         {
             var roles = new[]
             {
-                new QLVatTuPhongThiNghiem.Models.Entities.VaiTro { MaVaiTro = 1, TenVaiTro = "Admin", MoTa = "Quản trị viên hệ thống" },
-                new QLVatTuPhongThiNghiem.Models.Entities.VaiTro { MaVaiTro = 2, TenVaiTro = "QuanLy", MoTa = "Quản lý phòng thí nghiệm" },
-                new QLVatTuPhongThiNghiem.Models.Entities.VaiTro { MaVaiTro = 3, TenVaiTro = "NhanVien", MoTa = "Nhân viên sử dụng thiết bị" },
-                new QLVatTuPhongThiNghiem.Models.Entities.VaiTro { MaVaiTro = 4, TenVaiTro = "SinhVien", MoTa = "Sinh viên thực hành" }
+                new QLVatTuPhongThiNghiem.Models.Entities.VaiTro { TenVaiTro = "Admin", MoTa = "Quản trị viên hệ thống" },
+                new QLVatTuPhongThiNghiem.Models.Entities.VaiTro { TenVaiTro = "QuanLy", MoTa = "Quản lý phòng thí nghiệm" },
+                new QLVatTuPhongThiNghiem.Models.Entities.VaiTro { TenVaiTro = "NhanVien", MoTa = "Nhân viên sử dụng thiết bị" },
+                new QLVatTuPhongThiNghiem.Models.Entities.VaiTro { TenVaiTro = "SinhVien", MoTa = "Sinh viên thực hành" }
             };
 
             context.VaiTro.AddRange(roles);
+            await context.SaveChangesAsync(); // 👈 Quan trọng: lưu để có MaVaiTro
         }
 
         // Assign admin role to admin user
         if (!await context.NguoiDungVaiTro.AnyAsync())
         {
+            // Lấy ID của vai trò Admin
+            var adminRoleId = await context.VaiTro
+                .Where(v => v.TenVaiTro == "Admin")
+                .Select(v => v.MaVaiTro)
+                .FirstOrDefaultAsync();
+
             context.NguoiDungVaiTro.Add(new QLVatTuPhongThiNghiem.Models.Entities.NguoiDungVaiTro
             {
                 MaNguoiDung = 1,
-                MaVaiTro = 1, // Admin role
+                MaVaiTro = adminRoleId,
                 NgayCapQuyen = DateTime.Now,
                 TrangThai = true
             });
         }
 
-        // Seed sample data for testing
+        // Phòng máy mẫu
         if (!await context.PhongMay.AnyAsync())
         {
             var phongMayList = new[]
             {
-                new QLVatTuPhongThiNghiem.Models.Entities.PhongMay { MaPhongMay = 1, TenPhongMay = "Phòng máy 1" },
-                new QLVatTuPhongThiNghiem.Models.Entities.PhongMay { MaPhongMay = 2, TenPhongMay = "Phòng máy 2" },
-                new QLVatTuPhongThiNghiem.Models.Entities.PhongMay { MaPhongMay = 3, TenPhongMay = "Phòng thí nghiệm A" },
-                new QLVatTuPhongThiNghiem.Models.Entities.PhongMay { MaPhongMay = 4, TenPhongMay = "Phòng thí nghiệm B" }
+                new QLVatTuPhongThiNghiem.Models.Entities.PhongMay { TenPhongMay = "Phòng máy 1" },
+                new QLVatTuPhongThiNghiem.Models.Entities.PhongMay { TenPhongMay = "Phòng máy 2" },
+                new QLVatTuPhongThiNghiem.Models.Entities.PhongMay { TenPhongMay = "Phòng thí nghiệm A" },
+                new QLVatTuPhongThiNghiem.Models.Entities.PhongMay { TenPhongMay = "Phòng thí nghiệm B" }
             };
             context.PhongMay.AddRange(phongMayList);
         }
 
+        // Loại thiết bị mẫu
         if (!await context.Loai.AnyAsync())
         {
             var loaiList = new[]
@@ -215,6 +224,7 @@ static async Task SeedDefaultDataAsync(AppDbContext context)
             context.Loai.AddRange(loaiList);
         }
 
+        // Thương hiệu mẫu
         if (!await context.ThuongHieu.AnyAsync())
         {
             var thuongHieuList = new[]
@@ -229,6 +239,7 @@ static async Task SeedDefaultDataAsync(AppDbContext context)
             context.ThuongHieu.AddRange(thuongHieuList);
         }
 
+        // Nhân viên mẫu
         if (!await context.NhanVien.AnyAsync())
         {
             var nhanVienList = new[]
@@ -255,11 +266,11 @@ static async Task SeedDefaultDataAsync(AppDbContext context)
             context.NhanVien.AddRange(nhanVienList);
         }
 
+        // Cuối cùng, lưu tất cả dữ liệu
         await context.SaveChangesAsync();
     }
     catch (Exception ex)
     {
-        // Log the error but don't stop the application
         Console.WriteLine($"Error seeding data: {ex.Message}");
     }
 }

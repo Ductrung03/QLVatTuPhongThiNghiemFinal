@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace QLVatTuPhongThiNghiem.Models.ViewModels
 {
@@ -30,7 +31,7 @@ namespace QLVatTuPhongThiNghiem.Models.ViewModels
 
         [Display(Name = "Lần đăng nhập cuối")]
         public DateTime? LanDangNhapCuoi { get; set; }
-
+        [NotMapped]
         public List<int> DanhSachVaiTro { get; set; } = new List<int>();
         public string TenVaiTro { get; set; }
     }
@@ -105,7 +106,7 @@ namespace QLVatTuPhongThiNghiem.Models.ViewModels
 
         [Display(Name = "Trạng thái")]
         public bool TrangThai { get; set; } = true;
-
+        [NotMapped]
         public List<int> DanhSachQuyen { get; set; } = new List<int>();
     }
 

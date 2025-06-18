@@ -1,16 +1,23 @@
-﻿<div class="sidebar-wrapper" sidebar-layout="stroke-svg">
+﻿@using Microsoft.AspNetCore.Http
+@{
+    var currentUser = ViewContext.HttpContext.Session.GetString("TenDangNhap");
+    var userPermissions = ViewContext.HttpContext.Session.GetString("QuyenHan")?.Split(',') ?? new string[0];
+    bool HasPermission(string permission) => userPermissions.Contains(permission);
+}
+
+<div class="sidebar-wrapper" sidebar-layout="stroke-svg">
     <div>
         <div class="logo-wrapper">
             <a asp-controller="Dashboard" asp-action="Index">
-                <img class="img-fluid for-light" src="~/assets/images/logo/logo.png" alt="">
-                <img class="img-fluid for-dark" src="~/assets/images/logo/logo_dark.png" alt="">
+                <img class="img-fluid for-light" src="~/assets/images/logo/logo.png" alt="Logo">
+                <img class="img-fluid for-dark" src="~/assets/images/logo/logo_dark.png" alt="Logo">
             </a>
             <div class="back-btn"><i class="fa fa-angle-left"></i></div>
-            <div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="grid"> </i></div>
+            <div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="grid"></i></div>
         </div>
         <div class="logo-icon-wrapper">
             <a asp-controller="Dashboard" asp-action="Index">
-                <img class="img-fluid" src="~/assets/images/logo/logo-icon.png" alt="">
+                <img class="img-fluid" src="~/assets/images/logo/logo-icon.png" alt="Logo Icon">
             </a>
         </div>
         <nav class="sidebar-main">
@@ -23,7 +30,7 @@
                         </div>
                     </li>
 
-                    <!-- Dashboard -->
+                    <!-- Dashboard - Luôn hiển thị -->
                     <li class="sidebar-list">
                         <a class="sidebar-link sidebar-title" asp-controller="Dashboard" asp-action="Index">
                             <svg class="stroke-icon">
@@ -34,107 +41,239 @@
                     </li>
 
                     <!-- Quản lý thiết bị -->
-                    <li class="sidebar-list">
-                        <a class="sidebar-link sidebar-title">
-                            <svg class="stroke-icon">
-                                <use href="~/assets/svg/icon-sprite.svg#stroke-box"></use>
-                            </svg>
-                            <span>Quản lý thiết bị</span>
-                        </a>
-                        <ul class="sidebar-submenu">
-                            <li><a asp-controller="TrangTB" asp-action="Index">Danh sách thiết bị</a></li>
-                            <li><a asp-controller="TrangTB" asp-action="Create">Thêm thiết bị</a></li>
-                        </ul>
-                    </li>
+                    @if (HasPermission("QuanLyTrangTB_Read"))
+                    {
+                        <li class="sidebar-list">
+                            <a class="sidebar-link sidebar-title">
+                                <svg class="stroke-icon">
+                                    <use href="~/assets/svg/icon-sprite.svg#stroke-box"></use>
+                                </svg>
+                                <span>Quản lý thiết bị</span>
+                            </a>
+                            <ul class="sidebar-submenu">
+                                <li><a asp-controller="TrangTB" asp-action="Index">Danh sách thiết bị</a></li>
+                                @if (HasPermission("QuanLyTrangTB_Create"))
+                                {
+                                    <li><a asp-controller="TrangTB" asp-action="Create">Thêm thiết bị</a></li>
+                                }
+                            </ul>
+                        </li>
+                    }
 
                     <!-- Lịch thực hành -->
-                    <li class="sidebar-list">
-                        <a class="sidebar-link sidebar-title">
-                            <svg class="stroke-icon">
-                                <use href="~/assets/svg/icon-sprite.svg#stroke-calendar"></use>
-                            </svg>
-                            <span>Lịch thực hành</span>
-                        </a>
-                        <ul class="sidebar-submenu">
-                            <li><a asp-controller="LichThucHanh" asp-action="Index">Tất cả lịch</a></li>
-                            <li><a asp-controller="LichThucHanh" asp-action="Create">Đăng ký lịch</a></li>
-                            <li><a asp-controller="LichThucHanh" asp-action="MySchedule">Lịch của tôi</a></li>
-                        </ul>
-                    </li>
+                    @if (HasPermission("LichThucHanh_Read"))
+                    {
+                        <li class="sidebar-list">
+                            <a class="sidebar-link sidebar-title">
+                                <svg class="stroke-icon">
+                                    <use href="~/assets/svg/icon-sprite.svg#stroke-calendar"></use>
+                                </svg>
+                                <span>Lịch thực hành</span>
+                            </a>
+                            <ul class="sidebar-submenu">
+                                <li><a asp-controller="LichThucHanh" asp-action="Index">Tất cả lịch</a></li>
+                                <li><a asp-controller="LichThucHanh" asp-action="MySchedule">Lịch của tôi</a></li>
+                                @if (HasPermission("LichThucHanh_Create"))
+                                {
+                                    <li><a asp-controller="LichThucHanh" asp-action="Create">Đăng ký lịch</a></li>
+                                }
+                                <li><a asp-controller="LichThucHanh" asp-action="Calendar">Lịch theo tháng</a></li>
+                            </ul>
+                        </li>
+                    }
 
                     <!-- Sửa chữa bảo hành -->
-                    <li class="sidebar-list">
-                        <a class="sidebar-link sidebar-title">
-                            <svg class="stroke-icon">
-                                <use href="~/assets/svg/icon-sprite.svg#stroke-tool"></use>
-                            </svg>
-                            <span>Sửa chữa bảo hành</span>
-                        </a>
-                        <ul class="sidebar-submenu">
-                            <li><a asp-controller="SuaChua" asp-action="Index">Danh sách</a></li>
-                            <li><a asp-controller="SuaChua" asp-action="Create">Tạo phiếu sửa chữa</a></li>
-                            <li><a asp-controller="SuaChua" asp-action="InProgress">Đang sửa chữa</a></li>
-                        </ul>
-                    </li>
+                    @if (HasPermission("SuaChua_Read"))
+                    {
+                        <li class="sidebar-list">
+                            <a class="sidebar-link sidebar-title">
+                                <svg class="stroke-icon">
+                                    <use href="~/assets/svg/icon-sprite.svg#stroke-tool"></use>
+                                </svg>
+                                <span>Sửa chữa bảo hành</span>
+                            </a>
+                            <ul class="sidebar-submenu">
+                                <li><a asp-controller="SuaChua" asp-action="Index">Danh sách</a></li>
+                                <li><a asp-controller="SuaChua" asp-action="MyRepairs">Phiếu của tôi</a></li>
+                                @if (HasPermission("SuaChua_Create"))
+                                {
+                                    <li><a asp-controller="SuaChua" asp-action="Create">Tạo phiếu sửa chữa</a></li>
+                                }
+                                <li><a asp-controller="SuaChua" asp-action="InProgress">Đang sửa chữa</a></li>
+                                @if (HasPermission("BaoCao_Read"))
+                                {
+                                    <li><a asp-controller="SuaChua" asp-action="Report">Báo cáo sửa chữa</a></li>
+                                }
+                            </ul>
+                        </li>
+                    }
 
                     <!-- Xuất nhập tồn -->
-                    <li class="sidebar-list">
-                        <a class="sidebar-link sidebar-title">
-                            <svg class="stroke-icon">
-                                <use href="~/assets/svg/icon-sprite.svg#stroke-archive"></use>
-                            </svg>
-                            <span>Xuất nhập tồn</span>
-                        </a>
-                        <ul class="sidebar-submenu">
-                            <li><a asp-controller="XuatNhapTon" asp-action="Index">Danh sách phiếu</a></li>
-                            <li><a asp-controller="XuatNhapTon" asp-action="Nhap">Nhập thiết bị</a></li>
-                            <li><a asp-controller="XuatNhapTon" asp-action="Xuat">Xuất thiết bị</a></li>
-                            <li><a asp-controller="XuatNhapTon" asp-action="BaoCaoTonKho">Báo cáo tồn kho</a></li>
-                        </ul>
-                    </li>
+                    @if (HasPermission("QuanLyTrangTB_Read"))
+                    {
+                        <li class="sidebar-list">
+                            <a class="sidebar-link sidebar-title">
+                                <svg class="stroke-icon">
+                                    <use href="~/assets/svg/icon-sprite.svg#stroke-archive"></use>
+                                </svg>
+                                <span>Xuất nhập tồn</span>
+                            </a>
+                            <ul class="sidebar-submenu">
+                                <li><a asp-controller="XuatNhapTon" asp-action="Index">Danh sách phiếu</a></li>
+                                @if (HasPermission("QuanLyTrangTB_Create"))
+                                {
+                                    <li><a asp-controller="XuatNhapTon" asp-action="Nhap">Nhập thiết bị</a></li>
+                                    <li><a asp-controller="XuatNhapTon" asp-action="Xuat">Xuất thiết bị</a></li>
+                                }
+                                <li><a asp-controller="XuatNhapTon" asp-action="BaoCaoTonKho">Báo cáo tồn kho</a></li>
+                            </ul>
+                        </li>
+                    }
 
                     <!-- Đánh giá cấp độ -->
-                    <li class="sidebar-list">
-                        <a class="sidebar-link sidebar-title">
-                            <svg class="stroke-icon">
-                                <use href="~/assets/svg/icon-sprite.svg#stroke-star"></use>
-                            </svg>
-                            <span>Đánh giá cấp độ</span>
-                        </a>
-                        <ul class="sidebar-submenu">
-                            <li><a asp-controller="DanhGiaCapDo" asp-action="Index">Danh sách đánh giá</a></li>
-                            <li><a asp-controller="DanhGiaCapDo" asp-action="Create">Thêm đánh giá</a></li>
-                        </ul>
-                    </li>
+                    @if (HasPermission("DanhGia_Read"))
+                    {
+                        <li class="sidebar-list">
+                            <a class="sidebar-link sidebar-title">
+                                <svg class="stroke-icon">
+                                    <use href="~/assets/svg/icon-sprite.svg#stroke-star"></use>
+                                </svg>
+                                <span>Đánh giá cấp độ</span>
+                            </a>
+                            <ul class="sidebar-submenu">
+                                <li><a asp-controller="DanhGiaCapDo" asp-action="Index">Danh sách đánh giá</a></li>
+                                <li><a asp-controller="DanhGiaCapDo" asp-action="MyRatings">Đánh giá của tôi</a></li>
+                                @if (HasPermission("DanhGia_Create"))
+                                {
+                                    <li><a asp-controller="DanhGiaCapDo" asp-action="Create">Thêm đánh giá</a></li>
+                                }
+                                <li><a asp-controller="DanhGiaCapDo" asp-action="TopEquipments" asp-route-isDescending="true">Top thiết bị tốt</a></li>
+                                @if (HasPermission("BaoCao_Read"))
+                                {
+                                    <li><a asp-controller="DanhGiaCapDo" asp-action="Report">Báo cáo đánh giá</a></li>
+                                }
+                            </ul>
+                        </li>
+                    }
 
                     <!-- Dữ liệu danh mục -->
+                    @if (HasPermission("QuanLyTrangTB_Read"))
+                    {
+                        <li class="sidebar-list">
+                            <a class="sidebar-link sidebar-title">
+                                <svg class="stroke-icon">
+                                    <use href="~/assets/svg/icon-sprite.svg#stroke-settings"></use>
+                                </svg>
+                                <span>Dữ liệu danh mục</span>
+                            </a>
+                            <ul class="sidebar-submenu">
+                                <li><a asp-controller="MasterData" asp-action="Loai">Loại thiết bị</a></li>
+                                <li><a asp-controller="MasterData" asp-action="ThuongHieu">Thương hiệu</a></li>
+                                <li><a asp-controller="MasterData" asp-action="PhongMay">Phòng máy</a></li>
+                                @if (HasPermission("NguoiDung_Read"))
+                                {
+                                    <li><a asp-controller="MasterData" asp-action="NhanVien">Nhân viên</a></li>
+                                }
+                            </ul>
+                        </li>
+                    }
+
+                    <!-- Lịch trực -->
+                    @if (HasPermission("LichThucHanh_Read"))
+                    {
+                        <li class="sidebar-list">
+                            <a class="sidebar-link sidebar-title">
+                                <svg class="stroke-icon">
+                                    <use href="~/assets/svg/icon-sprite.svg#stroke-clock"></use>
+                                </svg>
+                                <span>Lịch trực</span>
+                            </a>
+                            <ul class="sidebar-submenu">
+                                <li><a asp-controller="LichTruc" asp-action="Index">Danh sách lịch trực</a></li>
+                                <li><a asp-controller="LichTruc" asp-action="Calendar">Lịch theo tháng</a></li>
+                                @if (HasPermission("LichThucHanh_Create"))
+                                {
+                                    <li><a asp-controller="LichTruc" asp-action="Create">Tạo lịch trực</a></li>
+                                }
+                            </ul>
+                        </li>
+                    }
+
+                    <!-- Thông báo -->
                     <li class="sidebar-list">
                         <a class="sidebar-link sidebar-title">
                             <svg class="stroke-icon">
-                                <use href="~/assets/svg/icon-sprite.svg#stroke-settings"></use>
+                                <use href="~/assets/svg/icon-sprite.svg#stroke-bell"></use>
                             </svg>
-                            <span>Dữ liệu danh mục</span>
+                            <span>Thông báo</span>
                         </a>
                         <ul class="sidebar-submenu">
-                            <li><a asp-controller="MasterData" asp-action="Loai">Loại thiết bị</a></li>
-                            <li><a asp-controller="MasterData" asp-action="ThuongHieu">Thương hiệu</a></li>
-                            <li><a asp-controller="MasterData" asp-action="PhongMay">Phòng máy</a></li>
+                            <li><a asp-controller="ThongBao" asp-action="Index">Thông báo của tôi</a></li>
+                            @if (HasPermission("NguoiDung_Create"))
+                            {
+                                <li><a asp-controller="ThongBao" asp-action="Manage">Quản lý thông báo</a></li>
+                                <li><a asp-controller="ThongBao" asp-action="Create">Tạo thông báo</a></li>
+                            }
                         </ul>
                     </li>
 
                     <!-- Báo cáo thống kê -->
+                    @if (HasPermission("BaoCao_Read"))
+                    {
+                        <li class="sidebar-list">
+                            <a class="sidebar-link sidebar-title">
+                                <svg class="stroke-icon">
+                                    <use href="~/assets/svg/icon-sprite.svg#stroke-bar-chart"></use>
+                                </svg>
+                                <span>Báo cáo thống kê</span>
+                            </a>
+                            <ul class="sidebar-submenu">
+                                <li><a asp-controller="BaoCao" asp-action="ThongKeTheoPhong">Thống kê theo phòng</a></li>
+                                <li><a asp-controller="BaoCao" asp-action="SuDungTheoThang">Sử dụng theo tháng</a></li>
+                                <li><a asp-controller="BaoCao" asp-action="ChiPhiSuaChua">Chi phí sửa chữa</a></li>
+                                <li><a asp-controller="BaoCao" asp-action="DanhGiaCapDo">Đánh giá cấp độ</a></li>
+                            </ul>
+                        </li>
+                    }
+
+                    <!-- Quản lý hệ thống -->
+                    @if (HasPermission("NguoiDung_Read"))
+                    {
+                        <li class="sidebar-main-title">
+                            <div>
+                                <h6 class="lan-8">QUẢN LÝ HỆ THỐNG</h6>
+                            </div>
+                        </li>
+
+                        <li class="sidebar-list">
+                            <a class="sidebar-link sidebar-title">
+                                <svg class="stroke-icon">
+                                    <use href="~/assets/svg/icon-sprite.svg#stroke-users"></use>
+                                </svg>
+                                <span>Quản lý người dùng</span>
+                            </a>
+                            <ul class="sidebar-submenu">
+                                <li><a asp-controller="NguoiDung" asp-action="Index">Danh sách người dùng</a></li>
+                                @if (HasPermission("NguoiDung_Create"))
+                                {
+                                    <li><a asp-controller="NguoiDung" asp-action="Create">Tạo tài khoản</a></li>
+                                }
+                                <li><a asp-controller="VaiTro" asp-action="Index">Quản lý vai trò</a></li>
+                                <li><a asp-controller="LichSuHoatDong" asp-action="Index">Lịch sử hoạt động</a></li>
+                            </ul>
+                        </li>
+                    }
+
+                    <!-- Cài đặt cá nhân -->
                     <li class="sidebar-list">
                         <a class="sidebar-link sidebar-title">
                             <svg class="stroke-icon">
-                                <use href="~/assets/svg/icon-sprite.svg#stroke-bar-chart"></use>
+                                <use href="~/assets/svg/icon-sprite.svg#stroke-user"></use>
                             </svg>
-                            <span>Báo cáo thống kê</span>
+                            <span>Cài đặt cá nhân</span>
                         </a>
                         <ul class="sidebar-submenu">
-                            <li><a asp-controller="BaoCao" asp-action="ThongKeTheoPhong">Thống kê theo phòng</a></li>
-                            <li><a asp-controller="BaoCao" asp-action="SuDungTheoThang">Sử dụng theo tháng</a></li>
-                            <li><a asp-controller="BaoCao" asp-action="ChiPhiSuaChua">Chi phí sửa chữa</a></li>
-                            <li><a asp-controller="BaoCao" asp-action="DanhGiaCapDo">Đánh giá cấp độ</a></li>
+                            <li><a asp-controller="NguoiDung" asp-action="ChangePassword">Đổi mật khẩu</a></li>
                         </ul>
                     </li>
                 </ul>

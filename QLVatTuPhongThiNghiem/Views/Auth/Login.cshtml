@@ -33,16 +33,40 @@
                     <div>
                         <div><a class="logo" href="#"><img class="img-fluid for-light" src="~/assets/images/logo/logo.png" alt="looginpage"><img class="img-fluid for-dark" src="~/assets/images/logo/logo_dark.png" alt="looginpage"></a></div>
                         <div class="login-main">
-                            <form class="theme-form" asp-action="Login" method="post">
+                            <form class="theme-form" asp-controller="Auth" asp-action="Login" method="post">
+
                                 <h4>Đăng nhập vào hệ thống</h4>
                                 <p>Nhập tên đăng nhập và mật khẩu để tiếp tục</p>
 
+                                <!-- ✅ Sửa logic validation -->
                                 @if (!ViewData.ModelState.IsValid)
                                 {
                                     <div class="alert alert-danger">
-                                        <asp-validation-summary asp-validation-summary="All" />
+                                        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                        {
+                                            <div>@error.ErrorMessage</div>
+                                        }
                                     </div>
                                 }
+
+                                <!-- ✅ Hiển thị thông báo lỗi từ TempData -->
+                                @if (TempData["ErrorMessage"] != null)
+                                {
+                                    <div class="alert alert-danger">
+                                        @TempData["ErrorMessage"]
+                                    </div>
+                                }
+
+                                <!-- ✅ Hiển thị thông báo thành công từ TempData -->
+                                @if (TempData["SuccessMessage"] != null)
+                                {
+                                    <div class="alert alert-success">
+                                        @TempData["SuccessMessage"]
+                                    </div>
+                                }
+
+                                <!-- ✅ Thêm Anti-forgery token -->
+                                @Html.AntiForgeryToken()
 
                                 <div class="form-group">
                                     <label class="col-form-label" asp-for="TenDangNhap">Tên đăng nhập</label>
@@ -88,15 +112,37 @@
         <script src="~/assets/js/script.js"></script>
 
         <script>
-            // Show/Hide password
-            $(".show-hide").click(function() {
-                $(this).toggleClass("show");
-                var input = $($(this).prev());
-                if (input.attr("type") == "password") {
-                    input.attr("type", "text");
-                } else {
-                    input.attr("type", "password");
-                }
+            $(document).ready(function() {
+                // Show/Hide password
+                $(".show-hide").click(function() {
+                    $(this).toggleClass("show");
+                    var input = $($(this).prev());
+                    if (input.attr("type") == "password") {
+                        input.attr("type", "text");
+                    } else {
+                        input.attr("type", "password");
+                    }
+                });
+
+                // ✅ Debug form submit
+                $('form').on('submit', function(e) {
+                    console.log('Form đang được submit...');
+                    console.log('Action:', $(this).attr('action'));
+                    console.log('Method:', $(this).attr('method'));
+
+                    // Kiểm tra dữ liệu form
+                    var username = $('input[name="TenDangNhap"]').val();
+                    var password = $('input[name="MatKhau"]').val();
+
+                    console.log('Username:', username);
+                    console.log('Password length:', password.length);
+
+                    if (!username || !password) {
+                        e.preventDefault();
+                        alert('Vui lòng nhập đầy đủ thông tin!');
+                        return false;
+                    }
+                });
             });
         </script>
     </div>

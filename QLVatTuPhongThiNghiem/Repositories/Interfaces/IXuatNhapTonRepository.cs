@@ -21,3 +21,4 @@ namespace QLVatTuPhongThiNghiem.Repositories.Interfaces
         Task<Dictionary<string, object>> ThongKeXuatNhapAsync(DateTime? tuNgay = null, DateTime? denNgay = null);
         Task<int> GetTonKhoThietBiAsync(int maTTB);
     }
+}
