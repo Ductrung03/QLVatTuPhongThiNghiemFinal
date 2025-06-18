@@ -1,0 +1,90 @@
+﻿@model QLVatTuPhongThiNghiem.Models.ViewModels.LichThucHanhViewModel
+@{
+    ViewData["Title"] = "Chi tiết lịch thực hành";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>Chi tiết lịch thực hành</h3>
+                </div>
+                <div class="col-6">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index", "Dashboard")">
+                                <i data-feather="home"></i>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index", "LichThucHanh")">Lịch thực hành</a>
+                        </li>
+                        <li class="breadcrumb-item active">Chi tiết</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header bg-primary">
+                        <h5 class="text-white mb-0">
+                            <i data-feather="calendar" class="me-2"></i>Thông tin lịch thực hành
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td><strong>Mã lịch:</strong></td>
+                                        <td>@Model.MaLich</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Người đăng ký:</strong></td>
+                                        <td>@Model.TenNguoiDung</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Thời gian bắt đầu:</strong></td>
+                                        <td>@Model.ThoiGianBD.ToString("dd/MM/yyyy HH:mm")</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Thời gian kết thúc:</strong></td>
+                                        <td>@Model.ThoiGianKT.ToString("dd/MM/yyyy HH:mm")</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Trạng thái:</strong></td>
+                                        <td>
+                                            <span class="badge bg-primary">@Model.TrangThai</span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="@Url.Action("Index", "LichThucHanh")" class="btn btn-secondary">
+                            <i data-feather="arrow-left"></i> Quay lại
+                        </a>
+                        <a href="@Url.Action("Edit", "LichThucHanh", new { id = Model.MaLich })" class="btn btn-warning">
+                            <i data-feather="edit"></i> Chỉnh sửa
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script {
+    <script>
+        $(document).ready(function() {
+            feather.replace();
+        });
+    </script>
+}

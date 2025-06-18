@@ -1,0 +1,256 @@
+﻿@model QLVatTuPhongThiNghiem.Models.ViewModels.LichTrucViewModel
+@{
+    ViewData["Title"] = "Chỉnh sửa lịch trực";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>Chỉnh sửa lịch trực</h3>
+                </div>
+                <div class="col-6">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index", "Dashboard")">
+                                <i data-feather="home"></i>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index", "LichTruc")">Lịch trực</a>
+                        </li>
+                        <li class="breadcrumb-item active">Chỉnh sửa</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-xl-8 col-lg-10">
+                <div class="card">
+                    <div class="card-header bg-warning">
+                        <h5 class="text-white mb-0">
+                            <i data-feather="edit" class="me-2"></i>Chỉnh sửa thông tin lịch trực
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="Edit" method="post" class="needs-validation" novalidate>
+                            <input asp-for="MaLich" type="hidden" />
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="Ngay" class="form-label">
+                                        Ngày trực <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="Ngay" class="form-control" type="date" required />
+                                    <span asp-validation-for="Ngay" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="CaLam" class="form-label">
+                                        Ca làm <span class="text-danger">*</span>
+                                    </label>
+                                    <select asp-for="CaLam" class="form-select" required>
+                                        <option value="">-- Chọn ca làm --</option>
+                                        @if (ViewBag.CaLamList != null)
+                                        {
+                                            @foreach (var item in ViewBag.CaLamList)
+                                            {
+                                                <option value="@item.Value">@item.Text</option>
+                                            }
+                                        }
+                                    </select>
+                                    <span asp-validation-for="CaLam" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="MaNV" class="form-label">
+                                        Nhân viên trực <span class="text-danger">*</span>
+                                    </label>
+                                    <select asp-for="MaNV" class="form-select" required>
+                                        <option value="">-- Chọn nhân viên --</option>
+                                        @if (ViewBag.NhanVienList != null)
+                                        {
+                                            @foreach (var item in ViewBag.NhanVienList)
+                                            {
+                                                <option value="@item.MaNV">@item.HoTen</option>
+                                            }
+                                        }
+                                    </select>
+                                    <span asp-validation-for="MaNV" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="MaPhongMay" class="form-label">
+                                        Phòng máy <span class="text-danger">*</span>
+                                    </label>
+                                    <select asp-for="MaPhongMay" class="form-select" required>
+                                        <option value="">-- Chọn phòng máy --</option>
+                                        @if (ViewBag.PhongMayList != null)
+                                        {
+                                            @foreach (var item in ViewBag.PhongMayList)
+                                            {
+                                                <option value="@item.MaPhongMay">@item.TenPhongMay</option>
+                                            }
+                                        }
+                                    </select>
+                                    <span asp-validation-for="MaPhongMay" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="TrangThai" class="form-label">Trạng thái</label>
+                                    <select asp-for="TrangThai" class="form-select">
+                                        @if (ViewBag.TrangThaiList != null)
+                                        {
+                                            @foreach (var item in ViewBag.TrangThaiList)
+                                            {
+                                                <option value="@item.Value">@item.Text</option>
+                                            }
+                                        }
+                                    </select>
+                                    <span asp-validation-for="TrangThai" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Thời gian ca làm</label>
+                                    <div class="form-control-plaintext" id="timeInfo">
+                                        @{
+                                            string timeText = Model.CaLam switch
+                                            {
+                                                "Ca sáng" => "Ca sáng (7:00 - 11:30)",
+                                                "Ca chiều" => "Ca chiều (13:30 - 17:00)",
+                                                "Ca tối" => "Ca tối (18:00 - 21:00)",
+                                                _ => "Chọn ca làm để xem thời gian"
+                                            };
+                                        }
+                                        @timeText
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <label asp-for="GhiChu" class="form-label">Ghi chú</label>
+                                    <textarea asp-for="GhiChu" class="form-control" rows="3"
+                                              placeholder="Ghi chú thêm về ca trực..."></textarea>
+                                    <span asp-validation-for="GhiChu" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <!-- Current Info -->
+                            <div class="alert alert-info">
+                                <h6><i data-feather="info"></i> Thông tin hiện tại:</h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>Ngày trực:</strong> @Model.Ngay.ToString("dd/MM/yyyy")<br>
+                                        <strong>Ca làm:</strong> @Model.CaLam<br>
+                                        <strong>Nhân viên:</strong> @Model.TenNhanVien
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Phòng máy:</strong> @Model.TenPhongMay<br>
+                                        <strong>Trạng thái:</strong> @Model.TrangThai<br>
+                                        <strong>Ghi chú:</strong> @(Model.GhiChu ?? "Không có")
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Notes -->
+                            <div class="alert alert-warning">
+                                <h6><i data-feather="alert-triangle"></i> Lưu ý khi chỉnh sửa:</h6>
+                                <ul class="mb-0">
+                                    <li>Chỉ có thể chỉnh sửa lịch trước 24 giờ so với thời gian trực</li>
+                                    <li>Không được tạo xung đột với lịch trực khác</li>
+                                    <li>Thay đổi sẽ được ghi lại trong lịch sử hệ thống</li>
+                                </ul>
+                            </div>
+
+                            <!-- Action buttons -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <hr>
+                                    <div class="d-flex justify-content-between">
+                                        <a asp-action="Index" class="btn btn-secondary">
+                                            <i data-feather="arrow-left"></i> Quay lại
+                                        </a>
+                                        <div>
+                                            <button type="reset" class="btn btn-warning me-2">
+                                                <i data-feather="refresh-cw"></i> Khôi phục
+                                            </button>
+                                            <button type="submit" class="btn btn-success">
+                                                <i data-feather="save"></i> Lưu thay đổi
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script {
+    <script>
+        $(document).ready(function() {
+            feather.replace();
+
+            // Form validation
+            const form = document.querySelector('.needs-validation');
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            });
+
+            // Update time info when ca lam changes
+            $('#CaLam').change(function() {
+                var selectedText = $(this).find('option:selected').text();
+                $('#timeInfo').text(selectedText || 'Chọn ca làm để xem thời gian');
+            });
+
+            // Check for conflicts when key fields change
+            $('#Ngay, #CaLam, #MaNV, #MaPhongMay').change(function() {
+                checkConflicts();
+            });
+
+            // Set minimum date to today for future dates only
+            var currentDate = new Date('@Model.Ngay.ToString("yyyy-MM-dd")');
+            var today = new Date();
+
+            if (currentDate > today) {
+                $('#Ngay').attr('min', today.toISOString().split('T')[0]);
+            }
+        });
+
+        function checkConflicts() {
+            var ngay = $('#Ngay').val();
+            var caLam = $('#CaLam').val();
+            var maNV = $('#MaNV').val();
+            var maPhongMay = $('#MaPhongMay').val();
+            var maLich = $('#MaLich').val();
+
+            if (ngay && caLam && maNV && maPhongMay) {
+                // Here you would typically make an AJAX call to check for conflicts
+                // excluding the current record
+                console.log('Checking conflicts for edit:', { ngay, caLam, maNV, maPhongMay, maLich });
+            }
+        }
+    </script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

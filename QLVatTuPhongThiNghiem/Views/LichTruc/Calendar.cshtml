@@ -1,0 +1,426 @@
+﻿@model IEnumerable<QLVatTuPhongThiNghiem.Models.ViewModels.LichTrucViewModel>
+@{
+    ViewData["Title"] = "Lịch trực theo tháng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>Lịch trực theo tháng</h3>
+                </div>
+                <div class="col-6">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index", "Dashboard")">
+                                <i data-feather="home"></i>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index", "LichTruc")">Lịch trực</a>
+                        </li>
+                        <li class="breadcrumb-item active">Lịch theo tháng</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row mb-3">
+            <div class="col-sm-12">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <a href="@Url.Action("Create", "LichTruc")" class="btn btn-success">
+                            <i data-feather="plus"></i> Tạo lịch trực
+                        </a>
+                        <a href="@Url.Action("Index", "LichTruc")" class="btn btn-secondary">
+                            <i data-feather="list"></i> Xem danh sách
+                        </a>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <label class="me-2">Tháng:</label>
+                        <input type="month" id="monthSelector" class="form-control" style="width: auto;"
+                               value="@ViewBag.Month?.ToString("yyyy-MM")" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-primary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="text-primary mb-0">@Model.Count()</h4>
+                                <p class="text-muted mb-0">Tổng ca trực</p>
+                            </div>
+                            <i data-feather="clock" class="text-primary" style="width: 48px; height: 48px;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-info">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="text-info mb-0">@Model.Count(x => x.CaLam == "Ca sáng")</h4>
+                                <p class="text-muted mb-0">Ca sáng</p>
+                            </div>
+                            <i data-feather="sunrise" class="text-info" style="width: 48px; height: 48px;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-warning">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="text-warning mb-0">@Model.Count(x => x.CaLam == "Ca chiều")</h4>
+                                <p class="text-muted mb-0">Ca chiều</p>
+                            </div>
+                            <i data-feather="sun" class="text-warning" style="width: 48px; height: 48px;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-secondary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="text-secondary mb-0">@Model.Count(x => x.CaLam == "Ca tối")</h4>
+                                <p class="text-muted mb-0">Ca tối</p>
+                            </div>
+                            <i data-feather="moon" class="text-secondary" style="width: 48px; height: 48px;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar -->
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header bg-primary">
+                        <h5 class="text-white mb-0">
+                            <i data-feather="calendar" class="me-2"></i>Lịch trực tháng
+                            @ViewBag.Month?.ToString("MM/yyyy")
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="calendar-container">
+                            <div class="calendar-grid">
+                                <div class="calendar-header">
+                                    <div class="day-header">Chủ nhật</div>
+                                    <div class="day-header">Thứ hai</div>
+                                    <div class="day-header">Thứ ba</div>
+                                    <div class="day-header">Thứ tư</div>
+                                    <div class="day-header">Thứ năm</div>
+                                    <div class="day-header">Thứ sáu</div>
+                                    <div class="day-header">Thứ bảy</div>
+                                </div>
+                                <div id="calendar-body">
+                                    @{
+                                        var month = ViewBag.Month ?? DateTime.Today;
+                                        var firstDay = new DateTime(month.Year, month.Month, 1);
+                                        var lastDay = firstDay.AddMonths(1).AddDays(-1);
+                                        var startDate = firstDay.AddDays(-(int)firstDay.DayOfWeek);
+                                        var today = DateTime.Today;
+
+                                        for (int week = 0; week < 6; week++)
+                                        {
+                                            for (int day = 0; day < 7; day++)
+                                            {
+                                                var currentDate = startDate.AddDays(week * 7 + day);
+                                                var isCurrentMonth = currentDate.Month == month.Month;
+                                                var isToday = currentDate.Date == today;
+                                                var daySchedules = Model.Where(x => x.Ngay.Date == currentDate.Date).ToList();
+
+                                                string dayClass = "calendar-day";
+                                                if (!isCurrentMonth) dayClass += " other-month";
+                                                if (isToday) dayClass += " today";
+
+                                                <div class="@dayClass" data-date="@currentDate.ToString("yyyy-MM-dd")">
+                                                    <div class="day-number">@currentDate.Day</div>
+                                                    @foreach (var schedule in daySchedules)
+                                                    {
+                                                        string badgeClass = schedule.CaLam switch
+                                                        {
+                                                            "Ca sáng" => "bg-info",
+                                                            "Ca chiều" => "bg-warning",
+                                                            "Ca tối" => "bg-secondary",
+                                                            _ => "bg-primary"
+                                                        };
+
+                                                        <div class="schedule-item badge @badgeClass"
+                                                             title="@schedule.TenNhanVien - @schedule.TenPhongMay">
+                                                            @schedule.CaLam.Replace("Ca ", "")
+                                                        </div>
+                                                    }
+                                                </div>
+                                            }
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="row mt-3">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h6>Chú thích:</h6>
+                        <div class="d-flex flex-wrap">
+                            <div class="me-3 mb-2">
+                                <span class="badge bg-info me-1">Sáng</span> Ca sáng (7:00 - 11:30)
+                            </div>
+                            <div class="me-3 mb-2">
+                                <span class="badge bg-warning me-1">Chiều</span> Ca chiều (13:30 - 17:00)
+                            </div>
+                            <div class="me-3 mb-2">
+                                <span class="badge bg-secondary me-1">Tối</span> Ca tối (18:00 - 21:00)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedule Details -->
+        <div class="row mt-3">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">Chi tiết lịch trực trong tháng</h6>
+                    </div>
+                    <div class="card-body">
+                        @if (Model?.Any() == true)
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-sm table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Ngày</th>
+                                            <th>Ca làm</th>
+                                            <th>Nhân viên</th>
+                                            <th>Phòng máy</th>
+                                            <th>Trạng thái</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.OrderBy(x => x.Ngay).ThenBy(x => x.CaLam))
+                                        {
+                                            <tr>
+                                                <td>@item.Ngay.ToString("dd/MM")</td>
+                                                <td>
+                                                    @{
+                                                        string caClass = item.CaLam == "Ca sáng" ? "bg-info" :
+                                                        item.CaLam == "Ca chiều" ? "bg-warning" : "bg-secondary";
+                                                    }
+                                                    <span class="badge @caClass">@item.CaLam</span>
+                                                </td>
+                                                <td>@item.TenNhanVien</td>
+                                                <td>@item.TenPhongMay</td>
+                                                <td>
+                                                    @{
+                                                        string statusClass = item.TrangThai switch
+                                                        {
+                                                            "Đã lên lịch" => "bg-primary",
+                                                            "Đang trực" => "bg-warning",
+                                                            "Hoàn thành" => "bg-success",
+                                                            "Đã hủy" => "bg-danger",
+                                                            _ => "bg-secondary"
+                                                        };
+                                                    }
+                                                    <span class="badge @statusClass">@item.TrangThai</span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-3">
+                                <i data-feather="calendar-x" size="48" class="text-muted mb-2"></i>
+                                <p class="text-muted mb-0">Không có lịch trực nào trong tháng này</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script {
+    <style>
+        .calendar-container {
+            overflow-x: auto;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background-color: #dee2e6;
+            border: 1px solid #dee2e6;
+            min-width: 700px;
+        }
+
+        .calendar-header {
+            display: contents;
+        }
+
+        .day-header {
+            background-color: #343a40;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .calendar-day {
+            background-color: white;
+            min-height: 100px;
+            padding: 8px;
+            position: relative;
+            border: 1px solid #dee2e6;
+        }
+
+            .calendar-day.other-month {
+                background-color: #f8f9fa;
+                color: #6c757d;
+            }
+
+            .calendar-day.today {
+                background-color: #fff3cd;
+                border-color: #ffc107;
+            }
+
+        .day-number {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 1rem;
+        }
+
+        .schedule-item {
+            font-size: 10px;
+            padding: 2px 4px;
+            margin-bottom: 2px;
+            border-radius: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+            cursor: pointer;
+        }
+
+            .schedule-item:hover {
+                opacity: 0.8;
+            }
+
+        @media (max-width: 768px) {
+            .day-header
+
+        {
+            padding: 5px;
+            font-size: 0.8rem;
+        }
+
+        .calendar-day {
+            min-height: 80px;
+            padding: 4px;
+        }
+
+        .day-number {
+            font-size: 0.9rem;
+        }
+
+        .schedule-item {
+            font-size: 9px;
+        }
+
+        }
+    </style>
+
+    <script>
+        $(document).ready(function() {
+            feather.replace();
+
+            // Month selector change
+            $('#monthSelector').change(function() {
+                var selectedMonth = $(this).val();
+                if (selectedMonth) {
+                    var [year, month] = selectedMonth.split('-');
+                    window.location.href = '@Url.Action("Calendar", "LichTruc")?month=' + year + '-' + month + '-01';
+                }
+            });
+
+            // Add tooltip for schedule items
+            $('.schedule-item').each(function() {
+                var title = $(this).attr('title');
+                if (title) {
+                    $(this).tooltip({
+                        placement: 'top',
+                        container: 'body'
+                    });
+                }
+            });
+
+            // Click event for calendar days
+            $('.calendar-day').click(function() {
+                var date = $(this).data('date');
+                var schedules = $(this).find('.schedule-item');
+
+                if (schedules.length > 0) {
+                    var content = '<div class="schedule-details">';
+                    schedules.each(function() {
+                        content += '<div class="mb-1">' + $(this).attr('title') + '</div>';
+                    });
+                    content += '</div>';
+
+                    Swal.fire({
+                        title: 'Lịch trực ngày ' + new Date(date).toLocaleDateString('vi-VN'),
+                        html: content,
+                        icon: 'info',
+                        confirmButtonText: 'Đóng'
+                    });
+                } else {
+                    var formattedDate = new Date(date).toLocaleDateString('vi-VN');
+                    Swal.fire({
+                        title: 'Ngày ' + formattedDate,
+                        text: 'Không có lịch trực trong ngày này',
+                        icon: 'info',
+                        showCancelButton: true,
+                        confirmButtonText: 'Tạo lịch trực',
+                        cancelButtonText: 'Đóng'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '@Url.Action("Create", "LichTruc")?date=' + date;
+                        }
+                    });
+                }
+            });
+
+            // Highlight current day
+            var today = new Date().toISOString().split('T')[0];
+            $('.calendar-day[data-date="' + today + '"]').addClass('today');
+        });
+    </script>
+}

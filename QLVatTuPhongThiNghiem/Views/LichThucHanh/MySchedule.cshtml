@@ -1,0 +1,122 @@
+﻿@model IEnumerable<QLVatTuPhongThiNghiem.Models.ViewModels.LichThucHanhViewModel>
+@{
+    ViewData["Title"] = "Lịch thực hành của tôi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>Lịch thực hành của tôi</h3>
+                </div>
+                <div class="col-6">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index", "Dashboard")">
+                                <i data-feather="home"></i>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index", "LichThucHanh")">Lịch thực hành</a>
+                        </li>
+                        <li class="breadcrumb-item active">Lịch của tôi</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row mb-3">
+            <div class="col-sm-12">
+                <a href="@Url.Action("Create", "LichThucHanh")" class="btn btn-success">
+                    <i data-feather="plus"></i> Đăng ký lịch mới
+                </a>
+                <a href="@Url.Action("Index", "LichThucHanh")" class="btn btn-secondary">
+                    <i data-feather="list"></i> Xem tất cả lịch
+                </a>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header bg-info">
+                        <h5 class="text-white mb-0">
+                            <i data-feather="user" class="me-2"></i>Lịch thực hành của tôi
+                            <span class="badge bg-light text-dark ms-2">@Model.Count() lịch</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        @if (Model?.Any() == true)
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>STT</th>
+                                            <th>Mã lịch</th>
+                                            <th>Thời gian bắt đầu</th>
+                                            <th>Thời gian kết thúc</th>
+                                            <th>Trạng thái</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int index = 1;
+                                        }
+                                        @foreach (var item in Model.OrderByDescending(x => x.ThoiGianBD))
+                                        {
+                                            <tr>
+                                                <td>@index</td>
+                                                <td><code>@item.MaLich</code></td>
+                                                <td>@item.ThoiGianBD.ToString("dd/MM/yyyy HH:mm")</td>
+                                                <td>@item.ThoiGianKT.ToString("dd/MM/yyyy HH:mm")</td>
+                                                <td>
+                                                    <span class="badge bg-primary">@item.TrangThai</span>
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group btn-group-sm">
+                                                        <a href="@Url.Action("Details", new { id = item.MaLich })" class="btn btn-info" title="Chi tiết">
+                                                            <i data-feather="eye"></i>
+                                                        </a>
+                                                        @if (item.TrangThai == "Chờ duyệt")
+                                                        {
+                                                            <a href="@Url.Action("Edit", new { id = item.MaLich })" class="btn btn-warning" title="Chỉnh sửa">
+                                                                <i data-feather="edit"></i>
+                                                            </a>
+                                                        }
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            index++;
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <i data-feather="calendar" size="64" class="text-muted mb-3"></i>
+                                <h5 class="text-muted">Bạn chưa có lịch thực hành nào</h5>
+                                <p class="text-muted">Hãy <a href="@Url.Action("Create", "LichThucHanh")">đăng ký lịch thực hành</a> để bắt đầu.</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script {
+    <script>
+        $(document).ready(function() {
+            feather.replace();
+        });
+    </script>
+}

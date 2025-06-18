@@ -1,0 +1,99 @@
+﻿@model QLVatTuPhongThiNghiem.Models.ViewModels.LichThucHanhViewModel
+@{
+    ViewData["Title"] = "Chỉnh sửa lịch thực hành";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>Chỉnh sửa lịch thực hành</h3>
+                </div>
+                <div class="col-6">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index", "Dashboard")">
+                                <i data-feather="home"></i>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index", "LichThucHanh")">Lịch thực hành</a>
+                        </li>
+                        <li class="breadcrumb-item active">Chỉnh sửa</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header bg-warning">
+                        <h5 class="text-white mb-0">
+                            <i data-feather="edit" class="me-2"></i>Chỉnh sửa thông tin lịch
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="Edit" method="post">
+                            <input asp-for="MaLich" type="hidden" />
+                            <input asp-for="MaNguoiDung" type="hidden" />
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="ThoiGianBD" class="form-label">Thời gian bắt đầu</label>
+                                    <input asp-for="ThoiGianBD" class="form-control" type="datetime-local" />
+                                    <span asp-validation-for="ThoiGianBD" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="ThoiGianKT" class="form-label">Thời gian kết thúc</label>
+                                    <input asp-for="ThoiGianKT" class="form-control" type="datetime-local" />
+                                    <span asp-validation-for="ThoiGianKT" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="TrangThai" class="form-label">Trạng thái</label>
+                                    <select asp-for="TrangThai" class="form-select">
+                                        <option value="Chờ duyệt">Chờ duyệt</option>
+                                        <option value="Đã duyệt">Đã duyệt</option>
+                                        <option value="Đang thực hiện">Đang thực hiện</option>
+                                        <option value="Hoàn thành">Hoàn thành</option>
+                                        <option value="Đã hủy">Đã hủy</option>
+                                    </select>
+                                    <span asp-validation-for="TrangThai" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-success">
+                                        <i data-feather="save"></i> Lưu thay đổi
+                                    </button>
+                                    <a href="@Url.Action("Details", new { id = Model.MaLich })" class="btn btn-secondary">
+                                        <i data-feather="arrow-left"></i> Quay lại
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script {
+    <script>
+        $(document).ready(function() {
+            feather.replace();
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
