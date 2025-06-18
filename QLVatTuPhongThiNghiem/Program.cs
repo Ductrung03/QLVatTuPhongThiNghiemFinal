@@ -9,6 +9,7 @@ using QLVatTuPhongThiNghiem.Repositories.Implements;
 using QLVatTuPhongThiNghiem.Services.Interfaces;
 using QLVatTuPhongThiNghiem.Services.Implements;
 using QLVatTuPhongThiNghiem.Extensions;
+using Cuba_Staterkit.Services.Interfaces;
 
 
 var builder = WebApplication.CreateBuilder(args);
